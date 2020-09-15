@@ -2,20 +2,7 @@
 {% load static %}
 {% block content %}
     <header>
-      <nav class="container container--70">
-        <ul class="nav--actions">
-          <li><a href="{% url 'login' %}">Zaloguj</a></li>
-          <li class="highlighted"><a href="{% url 'register' %}">Załóż konto</a></li>
-        </ul>
-
-        <ul>
-          <li><a href="{% url 'landing-page' %}">Start</a></li>
-          <li><a href="#">O co chodzi?</a></li>
-          <li><a href="#">O nas</a></li>
-          <li><a href="#">Fundacje i organizacje</a></li>
-          <li><a href="#">Kontakt</a></li>
-        </ul>
-      </nav>
+      {% include 'inkind/nav.html'%}
     </header>
 
     <section class="login-page">

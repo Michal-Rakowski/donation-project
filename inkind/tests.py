@@ -10,4 +10,32 @@ class LandingPageTests(TestCase):
         url = reverse('landing-page')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        
+
+class RegisterViewTests(TestCase):
+    def test_register_view_access(self):
+        """
+        Verifies register view is returning 200 ok status
+        """
+        url = reverse('register')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
+class LoginViewTests(TestCase):
+    def test_login_view_acccess(self):
+        """
+        Verifies login view is returning 200 ok status
+        """
+        url = reverse('login')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
+class AddDonationViewTests(TestCase):
+    def test_add_donation_access(self):
+        """
+        Verifies add-donation view is accessible upon request
+        """
+        url = reverse('add-donation')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
