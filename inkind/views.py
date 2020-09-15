@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.views import generic
+from django.db.models import Avg, Count, Min, Sum
+
+from .models import Donation, Institution, Category
 # Create your views here.
 
 class LandingPageView(generic.TemplateView):
@@ -8,6 +11,15 @@ class LandingPageView(generic.TemplateView):
     """
     template_name = 'inkind/index.html'
 
+    def get_context_data(self, **kwargs):
+        """
+        Calculates total of donated bags, total of supported institutions and 
+        pass its value to the template
+        """
+        context = super(LandingPageView, self).get_context_data(**kwargs)
+        context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
+        context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution'))['total_institutions']
+        return context
 
 class AddDonationView(generic.TemplateView):
     """
