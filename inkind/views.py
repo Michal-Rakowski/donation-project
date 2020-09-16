@@ -16,9 +16,12 @@ class LandingPageView(generic.TemplateView):
         Calculates total of donated bags, total of supported institutions and 
         pass its value to the template
         """
-        context = super(LandingPageView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
         context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution'))['total_institutions']
+        context['funds'] = Institution.objects.filter(institution_type='FUND')
+        context['orgs'] = Institution.objects.filter(institution_type='OPOZ')
+        context['locals'] = Institution.objects.filter(institution_type='ZLOK')
         return context
 
 class AddDonationView(generic.TemplateView):

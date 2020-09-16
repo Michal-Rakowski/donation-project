@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+#User settings
+#https://docs.djangoproject.com/en/dev/topics/auth/customizing/#specifying-a-custom-user-model
+AUTH_USER_MODEL = 'inkind.CustomUser'
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

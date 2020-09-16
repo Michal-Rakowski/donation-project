@@ -1,0 +1,2 @@
+>>> Institution.objects.values('institution_type').annotate(num_type=Count('institution_type'))
+<QuerySet [{'institution_type': 'OPOZ', 'num_type': 1}, {'institution_type': 'ZLOK', 'num_type': 1}, {'institution_type': 'FUND', 'num_type': 3}]>
