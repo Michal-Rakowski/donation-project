@@ -4,11 +4,11 @@
 <nav class="container container--70">
     <ul class="nav--actions">
       <li class="logged-user">
-        Witaj Agata
+        Witaj {{user.first_name}}
         <ul class="dropdown">
           <li><a href="#">Profil</a></li>
           <li><a href="#">Ustawienia</a></li>
-          <li><a href="#">Wyloguj</a></li>
+          <li><a href="{% url 'logout' %}">Wyloguj</a></li>
         </ul>
       </li>
     </ul>
@@ -39,3 +39,12 @@
     </ul>
   </nav>
 {% endif %}
+<div class="container container--70" style="text-align: center;font-size: 20px; margin-top: 70px;">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

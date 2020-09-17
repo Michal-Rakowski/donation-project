@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from .managers import CustomUserManager
+from donation import settings
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -19,7 +21,7 @@ class Institution(models.Model):
         ZBIORKA_LOCALNA = 'ZLOK', _('Zbiórka lokalna')
 
     institution_type = models.CharField(max_length=4, 
-        choices=InstitutionType.choices, default=InstitutionType.FUNDACJA, blank=False)
+        choices=InstitutionType.choices, default=InstitutionType.FUNDACJA)
     name = models.CharField(max_length=250)
     description = models.TextField()
     categories = models.ManyToManyField(Category)
@@ -38,8 +40,8 @@ class CustomUser(AbstractBaseUser):
             'unique': _('A user with such email already exists.'),
             },
     )
-    is_staff = models.BooleanField(_('Staff status'), default=False, help_text=
-            _('Designates whether the user can log in into admin site.'))
+    #is_staff = models.BooleanField(_('Staff status'), default=False, help_text=
+     #       _('Designates whether the user can log in into admin site.'))
     is_active = models.BooleanField(_('Active'), default=True, help_text=
             _('Designates whether this user should be treated as active.'
               'Unselect this instead of deleting accounts.'))
@@ -64,22 +66,40 @@ class CustomUser(AbstractBaseUser):
         # Simplest possible answer: Yes, always
         return True
 
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_admin
+
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        """Return the short name for the user."""
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        """Send an email to this user."""
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     categories = models.ManyToManyField(Category)
     
-    quantity = models.PositiveSmallIntegerField(verbose_name="Liczba worków")
-    address = models.CharField(max_length=150, verbose_name="Ulica i numer domu")
-    phone_number = models.CharField(max_length=25, verbose_name="Numer telefonu")
+    quantity = models.PositiveSmallIntegerField(_('number of bags'))
+    address = models.CharField(_('street and building number'), max_length=150)
+    phone_number = models.CharField(_('phone number'), max_length=25)
     city = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=15)
-    pick_up_date = models.DateField()
-    pick_up_time = models.DateTimeField()
+    pick_up_date_time = models.DateTimeField()
     pick_up_comment = models.CharField(max_length=200)
 
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
-
 

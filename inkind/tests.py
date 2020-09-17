@@ -11,6 +11,13 @@ class LandingPageTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_context_data(self):
+        """
+        Verifies whether context data are passed to the view correctly
+        """
+        ...
+
+
 class RegisterViewTests(TestCase):
     def test_register_view_access(self):
         """

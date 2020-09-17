@@ -74,97 +74,35 @@
 
      <section id="help" class="help">
       <h2>Komu pomagamy?</h2>
-
+      {% regroup institutions|dictsort:"institution_type" by get_institution_type_display as institution_list %}
+      
       <ul class="help--buttons">
-        <li data-id="1"><a href="#" class="btn btn--without-border active">Fundacjom</a></li>
-        <li data-id="2"><a href="#" class="btn btn--without-border">Organizacjom pozarządowym</a></li>
-        <li data-id="3"><a href="#" class="btn btn--without-border">Lokalnym zbiórkom</a></li>
+        {% for institution in institution_list %}
+        <li data-id="{{forloop.counter}}"><a href="#" class="btn btn--without-border {% if forloop.first %}active{% endif %}">{{ institution.grouper }}</a></li>
+        {% endfor %}
       </ul>
-
-      <!-- SLIDE 1 -->
-      <div class="help--slides active" data-id="1">
+      <!-- SLIDES -->
+      {% for institution in institution_list %}
+      <div class="help--slides {% if forloop.first %}active{% endif %}" data-id="{{forloop.counter}}">
         <p>W naszej bazie znajdziesz listę zweryfikowanych Fundacji, z którymi współpracujemy. Możesz sprawdzić czym się zajmują, komu pomagają i czego potrzebują.</p>
-
+        {% for org in institution.list %}
         <ul class="help--slides-items">
-          {% for fund in funds %}
           <li>
             <div class="col">
-              <div class="title">{{ fund.get_institution_type_display }} {{ fund.name }}</div>
-              <div class="subtitle">{{ fund.description }}</div>
-            </div>
-
-            <div class="col"><div class="text">{% for category in fund.categories.all %}
-              {{ category }}, 
-            {% endfor %}</div></div>
-          </li>
-          {% endfor %}
-        </ul>
-        <!-- Pagination
-        <ul class="help--slides-pagination">
-          <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>
-        </ul>
-        -->
-      </div>
-
-
-      <!-- SLIDE 2 -->
-      <div class="help--slides" data-id="2">
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Hic officiis mollitia dolor, neque aspernatur accusamus debitis. Ducimus, officia. Quia, sunt illum! Non iste placeat ab ipsum alias
-          quos suscipit corporis!
-        </p>
-        <ul class="help--slides-items">
-          {% for org in orgs %}
-          <li>
-            <div class="col">
-              <div class="title">{{ org.name}}</div>
+              <div class="title">{{ org.get_institution_type_display }} {{ org.name }}</div>
               <div class="subtitle">{{ org.description }}</div>
             </div>
 
             <div class="col"><div class="text">{% for category in org.categories.all %}
-              {{ category }}
-              {% endfor %}
-            </div></div>
+              {{ category }}, 
+            {% endfor %}</div></div>
           </li>
         </ul>
         {% endfor %}
-        <!-- Pagination
         <ul class="help--slides-pagination">
           <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="3">3</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="4">4</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="5">5</a></li>
         </ul>
-        -->
       </div>
-
-      <!-- SLIDE 3 -->
-      <div class="help--slides" data-id="3">
-        <p>Lorem ipsum dolor sit amet, his ocurreret persequeris ea, ad utinam laudem duo. Verterem adipisci partiendo eos ne, ea his reque quaeque recteque, ne quo lobortis intellegam.</p>
-        <ul class="help--slides-items">
-          {% for local in locals %}
-          <li>
-            <div class="col">
-              <div class="title">{{ local.name}}</div>
-              <div class="subtitle">{{ local.description}}</div>
-            </div>
-
-            <div class="col"><div class="text">{% for category in local.categories.all %}
-              {{ category }},
-              {% endfor %}
-            </div></div>
-          </li>
-        </ul>
-        {% endfor %}
-        <!-- Pagination
-        <ul class="help--slides-pagination">
-          <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
-          <li><a href="#" class="btn btn--small btn--without-border" data-page="2">2</a></li>
-        </ul>
-        -->
-      </div>
+      {% endfor %}
     </section>
 {% endblock %}

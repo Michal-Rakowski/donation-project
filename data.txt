@@ -1,2 +1,26 @@
 >>> Institution.objects.values('institution_type').annotate(num_type=Count('institution_type'))
 <QuerySet [{'institution_type': 'OPOZ', 'num_type': 1}, {'institution_type': 'ZLOK', 'num_type': 1}, {'institution_type': 'FUND', 'num_type': 3}]>
+
+
+>>> institutions = Institution.objects.values().order_by('id')
+>>> institutions
+<QuerySet [{'id': 1, 'institution_type': 'FUND', 'name': 'Zdążyć z Pomocą', 
+'description': 'Cel i misja: Ratowanie zagrożonego życia dzieci, przywracanie im zdrowia, 
+wspieranie ich edukacji i niesienie pomocy w trudnych warunkach materialnyc'}, 
+
+Category.objects.create(name='ubrania, które nadają sie do ponownego użytku')
+Category.objects.create(name='RTV/AGD')
+Category.objects.create(name='meble')
+Category.objects.create(name='kołdry/koce')
+Category.objects.create(name='książki')
+Category.objects.create(name='zabawki')
+Category.objects.create(name='inne')
+
+Institution.objects.create(name='Chłeb życia', description='Cel i misja: Pomóc dziesiątkom ubogich rodzin, przede wszystkim starszym, niepełnosprawnym, samotnym matkom żyjącym w nędzy.',institution_type='FUND')
+Institution.objects.create(name='Dzieci Afryki', description='Cel i misja: Działalnością rozwojową i humanitarną, organizowanie wypraw z misją pomocy i sprawiania radości ubogim dzieciom.',institution_type='FUND')
+Institution.objects.create(name='Zdążyć z Pomocą',description='Cel i misja: Ratowanie zagrożonego życia dzieci, przywracanie im zdrowia, wspieranie ich edukacji i niesienie pomocy w trudnych warunkach materialnych.', institution_type='FUND')
+Institution.objects.create(name='Habitat for Humanity Poland',description='cel i misja: Wspiercie niezamożnych osoby, które nie mają gdzie mieszkać lub mieszkają w nieodpowiednich warunkach.',institution_type='FUND')
+Institution.objects.create(name='Stowarzyszenie "SOS Wioski Dziecięce w Polsce" ',description='Cel i misja: Niesienie pomocy dzieciom pozbawionym opieki rodzicielskiej oraz zagrożonym jej utratą.',institution_type='OPOZ')
+Institution.objects.create(name='Polska Akcja Humanitarna',description='Cel i misja: Udzielanie pomocy humanitarnej, rozwojowej, prowadzenie edukacji społeczeństwa.', institution_type='OPOZ')
+Institution.objects.create(name='Dla dzieci z domów opieki',description='Cel i misja: Wsparcie dzieci, zamieszkujących w domach opieki',institution_type='ZLOK')
+Institution.objects.create(name='FARMY ŻYCIA',description='Cel i misja: Pomoc potrzebującym.',institution_type='ZLOK')

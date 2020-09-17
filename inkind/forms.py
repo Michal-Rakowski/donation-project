@@ -1,17 +1,24 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import AuthenticationForm
+from .models import CustomUser
 
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'placeholder': 'Hasło'}))
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput(attrs={'placeholder': 'Powtórz hasło'}))
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name')
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': 'Imię'}),
+            'last_name' : forms.TextInput(attrs={'placeholder': 'Nazwisko'}),
+            'email'     : forms.TextInput(attrs={'placeholder': 'E-Mail'}),
+        }
+        fields = ('first_name', 'last_name', 'email')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -47,3 +54,6 @@ class UserChangeForm(forms.ModelForm):
         # field does not have access to the initial value
         return self.initial["password"]
 
+class CustomLoginForm(AuthenticationForm):
+    username = forms.EmailField(widget=forms.EmailInput(attrs={'class':'validate','placeholder': 'Email'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Hasło'}))
