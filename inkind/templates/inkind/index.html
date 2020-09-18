@@ -71,8 +71,8 @@
       </div>
       <div class="about-us--image"><img src="{% static 'inkind/images/about-us.jpg' %}" alt="People in circle"></div>
     </section>
-
-     <section id="help" class="help">
+    <section id="help" class="help">
+    {% if institutions %}
       <h2>Komu pomagamy?</h2>
       {% regroup institutions|dictsort:"institution_type" by get_institution_type_display as institution_list %}
       
@@ -104,5 +104,8 @@
         </ul>
       </div>
       {% endfor %}
+    {% else %}
+        <h2>Zgloś instytucję</h2>
+    {% endif %}
     </section>
 {% endblock %}

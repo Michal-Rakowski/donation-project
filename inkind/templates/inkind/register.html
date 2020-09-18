@@ -9,6 +9,20 @@
       <h2>Załóż konto</h2>
       <form method="POST">
         {% csrf_token %}
+        {% if form.errors %}
+          {% for field in form %}
+              {% for error in field.errors %}
+                  <div class="alert alert-danger">
+                      <strong>{{ error|escape }}</strong>
+                  </div>
+              {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+              <div class="alert alert-danger">
+                  <strong>{{ error|escape }}</strong>
+              </div>
+          {% endfor %}
+        {% endif %}
         <div class="form-group">
           {% for field in form.hidden_fields %}
           <div class="form-group">{{ field }}<div>
