@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+#User settings
+#https://docs.djangoproject.com/en/dev/topics/auth/customizing/#specifying-a-custom-user-model
+AUTH_USER_MODEL = 'inkind.CustomUser'
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -122,7 +127,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'landing-page'
+LOGOUT_REDIRECT_URL = 'landing-page'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
