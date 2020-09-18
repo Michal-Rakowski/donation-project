@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.contrib.auth import views
 from django.db.models import Avg, Count, Min, Sum
+from django.http import HttpResponseRedirect 
 from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import Donation, Institution, Category, CustomUser
@@ -45,3 +47,24 @@ class RegistrationView(SuccessMessageMixin, generic.CreateView):
     template_name = 'inkind/register.html'
     success_url = reverse_lazy('login')
     success_message = "User was created successfully"
+
+class CustomLogin(views.LoginView):
+    """
+    Subclasses Django built-in LoginView overriding POST with redirect to registration view 
+    if user does not exist, redisplays login form otherwise
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            email = form.cleaned_data.get('username')
+            if not email in CustomUser.objects.values_list('email', flat=True):
+                return HttpResponseRedirect(reverse_lazy('register'))
+            else:
+                return self.form_invalid(form)
+            
