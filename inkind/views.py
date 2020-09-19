@@ -2,27 +2,27 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth import views
-from django.db.models import Avg, Count, Min, Sum
+from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect 
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm
-# Create your views here.
+
 
 class LandingPageView(generic.ListView):
     """
-    Displays landing page of the website
+    Displays landing page of the website which renders list of institions, set by 'self.model`
     """
     model = Institution
     template_name = 'inkind/index.html'
     context_object_name = 'institutions'
     #paginate_by = 5
 
-
     def get_context_data(self, **kwargs):
         """
-        Calculates total of donated bags, total of supported institutions and all institution
+        Calculates total of donated bags, total of supported institutions and
         passes its value to the template
         """
         context = super().get_context_data(**kwargs)
@@ -31,22 +31,16 @@ class LandingPageView(generic.ListView):
         return context
 
 
-class AddDonationView(generic.TemplateView):
-    """
-    Displays form for submitting a donation
-    """
-    template_name = 'inkind/form.html'
-
-
 class RegistrationView(SuccessMessageMixin, generic.CreateView):
     """
-    Creates user and redirects to login upon success
+    Creates user and redirects to login page upon success
     """
     model = CustomUser
     form_class = UserCreationForm
     template_name = 'inkind/register.html'
     success_url = reverse_lazy('login')
     success_message = "User was created successfully"
+
 
 class CustomLogin(views.LoginView):
     """
@@ -67,4 +61,20 @@ class CustomLogin(views.LoginView):
                 return HttpResponseRedirect(reverse_lazy('register'))
             else:
                 return self.form_invalid(form)
+
+
+class AddDonationView(LoginRequiredMixin, generic.TemplateView):
+    """
+    Displays form for submitting a donation
+    """
+    template_name = 'inkind/form.html'
+    
+    def get_context_data(self, **kwargs):
+        """
+        Passes context data  to the template for rendering        
+        """
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all().order_by('id')
+        context['institutions'] = Institution.objects.all()
+        return context
             

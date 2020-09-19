@@ -24,6 +24,9 @@
                   </div>
               {% endfor %}
             {% endif %}
+            {% if next %}
+            <p>Please log in to add donation</p>
+            {% endif %}
           <div class="form-group">
             {% for field in form.hidden_fields %}
             <div class="form-group">{{ field }} <div>
