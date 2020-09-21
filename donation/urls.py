@@ -29,4 +29,5 @@ urlpatterns = [
         ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
+    path('ajax/load-institutions/', views.load_institutions, name='ajax_load'),
 ]

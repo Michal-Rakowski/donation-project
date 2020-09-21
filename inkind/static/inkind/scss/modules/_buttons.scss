@@ -42,3 +42,6 @@
     border: 1px solid $main-color;
   }
 }
+  &.hidden {
+    display: none;
+  }

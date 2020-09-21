@@ -62,19 +62,26 @@ class CustomLogin(views.LoginView):
             else:
                 return self.form_invalid(form)
 
-
-class AddDonationView(LoginRequiredMixin, generic.TemplateView):
+from .forms import DonationForm
+from .models import Donation
+class AddDonationView(LoginRequiredMixin, generic.CreateView):
     """
     Displays form for submitting a donation
     """
+    model = Donation
     template_name = 'inkind/form.html'
-    
+    form_class = DonationForm
+   
     def get_context_data(self, **kwargs):
         """
         Passes context data  to the template for rendering        
         """
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all().order_by('id')
-        context['institutions'] = Institution.objects.all()
+        #context['institutions'] = Institution.objects.all()
         return context
             
+def load_institutions(request):
+    category_id = request.GET.get('category')
+    institutions = Institution.objects.filter(categories__id=category_id).order_by('name')
+    return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
