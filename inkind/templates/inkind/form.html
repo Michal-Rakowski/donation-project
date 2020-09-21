@@ -216,16 +216,16 @@
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
       <script>
       $("#categories-select").change(function () {
-        var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_cities` view
-        var categoryId = $("input[type=checkbox][name=category]:checked").val();  // get the selected country ID from the HTML input
+        var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
+        var categoryId = $("input[type=checkbox][name=category]:checked").val();  // get the selected category from the HTML input
 
         $.ajax({                       // initialize an AJAX request
-          url: url,                 // set the url of the request (= localhost:8000/ajax/load-institurions/)
+          url: url,                 // set the url of the request (= localhost:8000/ajax/load-institutions/)
           data: {
-            'category': categoryId       // add the country id to the GET parameters
+            'category': categoryId       // add the categoryid to the GET parameters
           },
           success: function (data) {   // `data` is the return of the `load_institutions` view function
-            $('#ajax').html(data);  // replace the contents of the city input with the data that came from the server
+            $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server
           }
         });
     
