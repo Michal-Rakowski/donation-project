@@ -217,12 +217,17 @@
       <script>
       $("#categories-select").change(function () {
         var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
-        var categoryId = $("input[type=checkbox][name=category]:checked").val();  // get the selected category from the HTML input
+        var category = ''
+        $.each($("input[type=checkbox][name=category]:checked"), function(){
+            category = category + ($(this).val());
+          });
+       // get the selected category from the HTML input
 
+  
         $.ajax({                       // initialize an AJAX request
           url: url,                 // set the url of the request (= localhost:8000/ajax/load-institutions/)
           data: {
-            'category': categoryId       // add the categoryid to the GET parameters
+            'category': category,       // add the categoryid to the GET parameters
           },
           success: function (data) {   // `data` is the return of the `load_institutions` view function
             $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server
