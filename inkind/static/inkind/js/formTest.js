@@ -1,11 +1,16 @@
+//Step - 1
 document.addEventListener("DOMContentLoaded", function(){
     let button = document.querySelector("#first-step");
-    let checkBoxes = document.querySelectorAll("span.checkbox")
+    let checkBoxes = document.querySelectorAll("input[type=checkbox][name=category]")
+    for (let i=0;i<checkBoxes.length;i++) {
+        checkBoxes[i].checked = false;
+        checkBoxes[i].classList.remove('selected')
+    }
     button.disabled = true
     for (let i=0;i<checkBoxes.length;i++) {
         checkBoxes[i].addEventListener("click", function(){
             checkBoxes[i].classList.toggle('selected');
-            let selected = document.querySelectorAll('span.checkbox.selected')
+            let selected = document.querySelectorAll('input[type=checkbox][name=category]:checked')
             if (selected.length <1 ) {
                 button.disabled = true
             } else {
@@ -15,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 });
 
+//Step - 2
 document.addEventListener("DOMContentLoaded", function(){
     let quantity = document.querySelector('input#id_quantity');
     let step2button = document.querySelector('#second-step');
@@ -27,19 +33,41 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 });
 
+//Step - 3
 document.addEventListener("DOMContentLoaded", function(){
     let step3button = document.querySelector('#third-step')
     step3button.disabled = true
     let ajax = document.querySelector("#ajax");
     ajax.addEventListener("click", function(){
-        step3button.disabled = false
+        step3button.disabled = false;
         });    
 });
 
+//Step - 4 thank you kind people on internet :) 
+document.addEventListener("DOMContentLoaded", function() {
+    let lastbutton = document.getElementById("summary-step");
+    lastbutton.disabled = true
+    let form = document.getElementById("pickup-info")
+    form.addEventListener('change', function(){
+        let allAreFilled = true;
+        document.getElementById("pickup-info").querySelectorAll("[required]").forEach(function(i) {
+            if (!allAreFilled) return;
+            if (!i.value) allAreFilled = false
+            });
+        if (!allAreFilled) {
+            lastbutton.disabled = true
+        } else {
+            lastbutton.disabled = false
+            }
+         });
+    });
+
+
+//step - 5 summary
 document.addEventListener("DOMContentLoaded", function() {
     let lastStep = document.getElementById('summary-step');
     lastStep.addEventListener('click', function (){
-        /* let categories = document.querySelectorAll('span.checkbox.selected') */
+        
         let quantity = document.getElementById('id_quantity').value;
         let address = document.getElementById('id_address').value;
         let city = document.getElementById('id_city').value;
@@ -50,7 +78,14 @@ document.addEventListener("DOMContentLoaded", function() {
         let comment = document.getElementById('id_pick_up_comment').value;
         let selected = document.querySelector("input[name='organization']:checked");
         let org = selected.getAttribute('data-desc')
-        document.getElementById('summarybox1').innerHTML = "Przekazujesz worki w ilości: " + quantity
+        let categories = document.querySelectorAll('input[type=checkbox][name=category]:checked');
+        let cats = ''
+        for (let i=0;i<categories.length;i++) {
+            cats = cats + categories[i].getAttribute('data-category') + ' '
+        }
+
+
+        document.getElementById('summarybox1').innerHTML =  quantity + ' worki ' + cats
         document.getElementById('summarybox2').innerText = "Dla " + org;
         document.getElementById('address').innerHTML = address
         document.getElementById('city').innerHTML = city

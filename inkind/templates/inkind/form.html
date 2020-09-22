@@ -66,6 +66,7 @@
                   type="checkbox"
                   name="category"
                   value="{{category.id}}"
+                  data-category="{{category.name}}"
                 />
                 <span class="checkbox" name="category" id="{{category.id}}"></span>
                 <span class="description">{{ category.name }}</span>
@@ -111,7 +112,7 @@
           <div data-step="4">
             <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
 
-            <div class="form-section form-section--columns">
+            <div class="form-section form-section--columns" id="pickup-info">
               <div class="form-section--column">
                 <h4>Adres odbioru</h4>
                 <div class="form-group form-group--inline">

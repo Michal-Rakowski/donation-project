@@ -83,10 +83,9 @@ class AddDonationView(LoginRequiredMixin, generic.CreateView):
         return context
 
 
-
-
-
 def load_institutions(request):
+    """Filtering Institutions on selected categories"""
+    #getting categories string
     category = request.GET.get('category')
     if category is not None:
         ids = list(map(int, [i for i in category.split(',')]))
