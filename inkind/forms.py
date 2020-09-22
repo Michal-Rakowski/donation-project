@@ -58,21 +58,31 @@ class CustomLoginForm(AuthenticationForm):
     username = forms.EmailField(widget=forms.EmailInput(attrs={'class':'validate','placeholder': 'Email'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Hasło'}))
 
+from django.utils import timezone
+
+def pick_up_date():
+    return timezone.now() + timezone.timedelta(days=1)
 
 class DonationForm(forms.ModelForm):
     """
     Form for submitting donation
     """
-    #categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, 
-                                                #queryset=Category.objects.all())
-    #institution = forms.ModelChoiceField(widget=forms.RadioSelect(), required=True, queryset=Institution.objects.all())
     quantity = forms.IntegerField(required=True, label='Liczba 60l worków: ', initial=1)
     address = forms.CharField(widget=forms.TextInput(), max_length=150, required=True)
     phone_number = forms.CharField(widget=forms.TextInput(), required=True)
-    city = forms.CharField(widget=forms.TextInput(), required=True)
-    zip_code = forms.CharField(widget=forms.TextInput(), required=True)
-    pick_up_date_time = forms.SplitDateTimeField(widget=forms.SplitDateTimeWidget(), required=True)
-    pick_up_comment = forms.CharField(widget=forms.TextInput())
+    city = forms.CharField(widget=forms.TextInput, required=True)
+    zip_code = forms.CharField(widget=forms.TextInput, required=True)
+    pick_up_date_time = forms.SplitDateTimeField(
+        input_time_formats=['%I:%M %p'], 
+        input_date_formats=['%d/%m/%Y'], 
+        initial=pick_up_date ,
+        required=True,
+        widget=forms.SplitDateTimeWidget(
+            date_format='%d/%m/%Y',
+            time_format='%H:%M',
+                date_attrs=({'class':'datepicker'}), # or override the ID, "id":id
+                time_attrs=({'class':'timepicker'})))
+    pick_up_comment = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Donation

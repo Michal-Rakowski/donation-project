@@ -64,6 +64,7 @@ class CustomLogin(views.LoginView):
 
 from .forms import DonationForm
 from .models import Donation
+
 class AddDonationView(LoginRequiredMixin, generic.CreateView):
     """
     Displays form for submitting a donation
@@ -80,7 +81,11 @@ class AddDonationView(LoginRequiredMixin, generic.CreateView):
         context['categories'] = Category.objects.all().order_by('id')
         #context['institutions'] = Institution.objects.all()
         return context
-            
+    
+                
+
+
+
 def load_institutions(request):
     category = request.GET.get('category')
     #print(category)

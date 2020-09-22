@@ -98,11 +98,11 @@
          <div data-step="3" id="id_institution">
            <h3>Wybierz organizacje, której chcesz pomóc:</h3>
            <div id='ajax'> 
-                <!--SHOULD BE LOADED BY AJAX CALL--> 
+                <!--SHOULD BE LOADED BY AJAX --> 
             </div>           
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="third-step">Dalej</button>
             </div>
           </div>
 -
@@ -115,47 +115,47 @@
               <div class="form-section--column">
                 <h4>Adres odbioru</h4>
                 <div class="form-group form-group--inline">
-                  <label> Ulica <input type="text" name="address" /> </label>
+                  <label> Ulica {{ form.address }}</label>
                 </div>
 
                 <div class="form-group form-group--inline">
-                  <label> Miasto <input type="text" name="city" /> </label>
+                  <label> Miasto {{ form.city }} </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
-                    Kod pocztowy <input type="text" name="postcode" />
+                    Kod pocztowy {{ form.zip_code }}
                   </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
-                    Numer telefonu <input type="phone" name="phone" />
+                    Numer telefonu {{ form.phone_number }}
                   </label>
                 </div>
               </div>
 
               <div class="form-section--column">
                 <h4>Termin odbioru</h4>
-                <div class="form-group form-group--inline">
-                  <label> Data <input type="date" name="data" /> </label>
+                <div class="form-group form-group--column">
+                  {{ form.pick_up_date_time }}
                 </div>
-
-                <div class="form-group form-group--inline">
+                
+             <!--   <div class="form-group form-group--inline">
                   <label> Godzina <input type="time" name="time" /> </label>
-                </div>
+                </div>-->
 
                 <div class="form-group form-group--inline">
                   <label>
                     Uwagi dla kuriera
-                    <textarea name="more_info" rows="5"></textarea>
+                    {{form.pick_up_comment}}
                   </label>
                 </div>
               </div>
             </div>
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="summary-step">Dalej</button>
             </div>
           </div>
 
@@ -169,16 +169,12 @@
                 <ul>
                   <li>
                     <span class="icon icon-bag"></span>
-                    <span class="summary--text"
-                    >4 worki ubrań w dobrym stanie dla dzieci</span
-                    >
+                    <span class="summary--text" id="summarybox1"> </span>
                   </li>
                   
                   <li>
                     <span class="icon icon-hand"></span>
-                    <span class="summary--text"
-                    >Dla fundacji "Mam marzenie" w Warszawie</span
-                    >
+                    <span class="summary--text" id="summarybox2"></span>
                   </li>
                 </ul>
               </div>
@@ -186,20 +182,20 @@
               <div class="form-section form-section--columns">
                 <div class="form-section--column">
                   <h4>Adres odbioru:</h4>
-                  <ul>
-                    <li>Prosta 51</li>
-                    <li>Warszawa</li>
-                    <li>99-098</li>
-                    <li>123 456 789</li>
+                  <ul id="summaryaddress">
+                    <li id="address"></li>
+                    <li id="city"></li>
+                    <li id="zip"></li>
+                    <li id="phone"></li>
                   </ul>
                 </div>
 
                 <div class="form-section--column">
                   <h4>Termin odbioru:</h4>
                   <ul>
-                    <li>13/12/2018</li>
-                    <li>15:40</li>
-                    <li>Brak uwag</li>
+                    <li id="date"></li>
+                    <li id="time"></li>
+                    <li id="comments"></li>
                   </ul>
                 </div>
               </div>
