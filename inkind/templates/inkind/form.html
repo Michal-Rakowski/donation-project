@@ -213,10 +213,11 @@
       <script>
       $("#categories-select").change(function () {
         var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
-        var category = ''
+        var category = []
         $.each($("input[type=checkbox][name=category]:checked"), function(){
-            category = category + ($(this).val());
+            category.push($(this).val());
           });
+        category = category.join(", ")
        // get the selected category from the HTML input
 
   

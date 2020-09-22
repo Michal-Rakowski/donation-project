@@ -81,17 +81,15 @@ class AddDonationView(LoginRequiredMixin, generic.CreateView):
         context['categories'] = Category.objects.all().order_by('id')
         #context['institutions'] = Institution.objects.all()
         return context
-    
-                
+
+
 
 
 
 def load_institutions(request):
     category = request.GET.get('category')
-    #print(category)
     if category is not None:
-        ids = [int(i) for i in category]
-        #print(ids)
+        ids = list(map(int, [i for i in category.split(',')]))
         institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
 
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
