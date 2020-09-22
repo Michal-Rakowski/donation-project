@@ -30,7 +30,6 @@
         </div>
       </div>
     </header>
-
     <section class="form--steps">
       <div class="form--steps-instructions">
         <div class="form--steps-container">
@@ -50,70 +49,34 @@
           <p data-step="4">Podaj adres oraz termin odbioru rzeczy.</p>
         </div>
       </div>
-
+      
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="form-confirmation.html" method="post">
+        <form action="form-confirmation.html" method="post" id="donationForm" institutions-url="{% url 'ajax_load' %}">
+          {% csrf_token%}
+        
           <!-- STEP 1: class .active is switching steps -->
-          <div data-step="1" class="active">
+          <div data-step="1" class="active" id="categories-select">
             <h3>Zaznacz co chcesz oddać:</h3>
-
+            {% for category in categories %}
             <div class="form-group form-group--checkbox">
               <label>
                 <input
                   type="checkbox"
-                  name="categories"
-                  value="clothes-to-use"
+                  name="category"
+                  value="{{category.id}}"
                 />
-                <span class="checkbox"></span>
-                <span class="description"
-                  >ubrania, które nadają się do ponownego użycia</span
-                >
+                <span class="checkbox" name="category" id="{{category.id}}"></span>
+                <span class="description">{{ category.name }}</span>
               </label>
             </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input
-                  type="checkbox"
-                  name="categories"
-                  value="clothes-useless"
-                />
-                <span class="checkbox"></span>
-                <span class="description">ubrania, do wyrzucenia</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="toys" />
-                <span class="checkbox"></span>
-                <span class="description">zabawki</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="books" />
-                <span class="checkbox"></span>
-                <span class="description">książki</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="other" />
-                <span class="checkbox"></span>
-                <span class="description">inne</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--buttons">
-              <button type="button" class="btn next-step">Dalej</button>
-            </div>
+            {% endfor %}
+          <div class="form-group form-group--buttons">
+            <button type="button" class="btn next-step" id="first-step">Dalej</button>
           </div>
-
+          </div>                       
+          <script src="{% static 'inkind/js/formTest.js'%}"></script>
           <!-- STEP 2 -->
           <div data-step="2">
             <h3>Podaj liczbę 60l worków, w które spakowałeś/aś rzeczy:</h3>
@@ -121,57 +84,30 @@
             <div class="form-group form-group--inline">
               <label>
                 Liczba 60l worków:
-                <input type="number" name="bags" step="1" min="1" />
+                {{form.quantity}}
               </label>
             </div>
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="second-step">Dalej</button>
             </div>
           </div>
 
-
-
+          <!-- STEP 3 -->
+         <div data-step="3" id="id_institution">
+           <h3>Wybierz organizacje, której chcesz pomóc:</h3>
+           <div id='ajax'> 
+                <!--SHOULD BE LOADED BY AJAX CALL--> 
+            </div>           
+            <div class="form-group form-group--buttons">
+              <button type="button" class="btn prev-step">Wstecz</button>
+              <button type="button" class="btn next-step">Dalej</button>
+            </div>
+          </div>
+-
+      
           <!-- STEP 4 -->
-          <div data-step="3">
-            <h3>Wybierz organizacje, której chcesz pomóc:</h3>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="radio" name="organization" value="old" />
-                <span class="checkbox radio"></span>
-                <span class="description">
-                  <div class="title">Fundacja “Bez domu”</div>
-                  <div class="subtitle">
-                    Cel i misja: Pomoc dla osób nie posiadających miejsca
-                    zamieszkania
-                  </div>
-                </span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="radio" name="organization" value="old" />
-                <span class="checkbox radio"></span>
-                <span class="description">
-                  <div class="title">Fundacja “Dla dzieci"</div>
-                  <div class="subtitle">
-                    Cel i misja: Pomoc osobom znajdującym się w trudnej sytuacji
-                    życiowej.
-                  </div>
-                </span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--buttons">
-              <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
-            </div>
-          </div>
-
-          <!-- STEP 5 -->
           <div data-step="4">
             <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
 
@@ -223,7 +159,7 @@
             </div>
           </div>
 
-          <!-- STEP 6 -->
+          <!-- STEP 5 -->
           <div data-step="5">
             <h3>Podsumowanie Twojej darowizny</h3>
 
@@ -234,14 +170,14 @@
                   <li>
                     <span class="icon icon-bag"></span>
                     <span class="summary--text"
-                      >4 worki ubrań w dobrym stanie dla dzieci</span
+                    >4 worki ubrań w dobrym stanie dla dzieci</span
                     >
                   </li>
-
+                  
                   <li>
                     <span class="icon icon-hand"></span>
                     <span class="summary--text"
-                      >Dla fundacji "Mam marzenie" w Warszawie</span
+                    >Dla fundacji "Mam marzenie" w Warszawie</span
                     >
                   </li>
                 </ul>
@@ -277,4 +213,27 @@
         </form>
       </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+      <script>
+      $("#categories-select").change(function () {
+        var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
+        var category = ''
+        $.each($("input[type=checkbox][name=category]:checked"), function(){
+            category = category + ($(this).val());
+          });
+       // get the selected category from the HTML input
+
+  
+        $.ajax({                       // initialize an AJAX request
+          url: url,                 // set the url of the request (= localhost:8000/ajax/load-institutions/)
+          data: {
+            'category': category,       // add the categoryid to the GET parameters
+          },
+          success: function (data) {   // `data` is the return of the `load_institutions` view function
+            $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server
+          }
+        });
+    
+        });
+      </script>
 {% endblock %}
