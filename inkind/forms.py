@@ -68,21 +68,15 @@ class DonationForm(forms.ModelForm):
     Form for submitting donation
     """
     quantity = forms.IntegerField(required=True, label='Liczba 60l worków: ', initial=1)
-    address = forms.CharField(widget=forms.TextInput(), max_length=150, required=True)
-    phone_number = forms.CharField(widget=forms.TextInput(), required=True)
+    address = forms.CharField(widget=forms.TextInput, max_length=150, required=True)
+    phone_number = forms.CharField(widget=forms.TextInput, required=True)
     city = forms.CharField(widget=forms.TextInput, required=True)
     zip_code = forms.CharField(widget=forms.TextInput, required=True)
     pick_up_date_time = forms.SplitDateTimeField(
-        input_time_formats=['%I:%M %p'], 
-        input_date_formats=['%d/%m/%Y'], 
-        initial=pick_up_date ,
+        initial=pick_up_date,
         required=True,
-        widget=forms.SplitDateTimeWidget(
-            date_format='%d/%m/%Y',
-            time_format='%H:%M',
-                date_attrs=({'class':'datepicker'}), # or override the ID, "id":id
-                time_attrs=({'class':'timepicker'})))
-    pick_up_comment = forms.CharField(widget=forms.Textarea)
+        widget=forms.SplitDateTimeWidget)
+    pick_up_comment = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:
         model = Donation
@@ -92,7 +86,7 @@ class DonationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['institution'].queryset = Institution.objects.none()
 
-    def save(self):
-        donation = form.save(commit=False)
-        donation.user = request.user
-        donation.save()
+    #def save(self):
+    #    donation = form.save(commit=False)
+    #    donation.user = request.user
+    #    donation.save()

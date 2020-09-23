@@ -53,7 +53,7 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="form-confirmation.html" method="post" id="donationForm" institutions-url="{% url 'ajax_load' %}">
+        <form action="." method="POST" id="donationForm" institutions-url="{% url 'ajax_load' %}">
           {% csrf_token%}
         
           <!-- STEP 1: class .active is switching steps -->
@@ -85,7 +85,7 @@
             <div class="form-group form-group--inline">
               <label>
                 Liczba 60l worków:
-                {{form.quantity}}
+                {{ form.quantity }}
               </label>
             </div>
 
@@ -223,9 +223,11 @@
 
   
         $.ajax({                       // initialize an AJAX request
-          url: url,                 // set the url of the request (= localhost:8000/ajax/load-institutions/)
+          url: url,
+          type: "POST",                  // set the url of the request (= localhost:8000/ajax/load-institutions/)
           data: {
-            'category': category,       // add the categoryid to the GET parameters
+            'category': category,
+            'csrfmiddlewaretoken': '{{ csrf_token }}',    // add the categoryid to the GET parameters
           },
           success: function (data) {   // `data` is the return of the `load_institutions` view function
             $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server

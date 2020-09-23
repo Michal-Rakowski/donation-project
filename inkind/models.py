@@ -91,7 +91,7 @@ class CustomUser(AbstractBaseUser):
 
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=True, null=True)
     categories = models.ManyToManyField(Category)
     
     quantity = models.PositiveSmallIntegerField(_('number of bags'))
