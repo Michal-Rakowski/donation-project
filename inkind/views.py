@@ -87,8 +87,8 @@ class AddDonationView(LoginRequiredMixin, generic.FormView):
         self.object.save()
         category = self.request.POST.getlist('category')
         categories_id = list(map(int, category))
-        for pk in categories_id:
-            cat = Category.objects.get(pk=pk)
+        for i_d in categories_id:
+            cat = Category.objects.get(pk=i_d)
             self.object.categories.add(cat)
     
         return super().form_valid(form)

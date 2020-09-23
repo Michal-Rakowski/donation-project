@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
 
-        document.getElementById('summarybox1').innerHTML =  quantity + ' worki ' + cats
+        document.getElementById('summarybox1').innerHTML =  quantity + ' worki w kateg.: ' + cats
         document.getElementById('summarybox2').innerText = "Dla " + org;
         document.getElementById('address').innerHTML = address
         document.getElementById('city').innerHTML = city
