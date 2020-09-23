@@ -53,7 +53,7 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="." method="POST" id="donationForm" institutions-url="{% url 'ajax_load' %}">
+        <form action="" method="POST" id="donationForm" institutions-url="{% url 'ajax_load' %}">
           {% csrf_token%}
         
           <!-- STEP 1: class .active is switching steps -->
@@ -62,56 +62,49 @@
             {% for category in categories %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input
-                  type="checkbox"
-                  name="category"
-                  value="{{category.id}}"
-                  data-category="{{category.name}}"
-                />
+                <input type="checkbox" name="category" value="{{category.id}}" data-category="{{category.name}}"/>
                 <span class="checkbox" name="category" id="{{category.id}}"></span>
                 <span class="description">{{ category.name }}</span>
               </label>
             </div>
             {% endfor %}
-          <div class="form-group form-group--buttons">
-            <button type="button" class="btn next-step" id="first-step">Dalej</button>
-          </div>
-          </div>                       
-          <script src="{% static 'inkind/js/formTest.js'%}"></script>
+            <div class="form-group form-group--buttons">
+              <button type="button" class="btn next-step" id="first-step">Dalej</button>
+            </div>
+          </div>     
+
           <!-- STEP 2 -->
           <div data-step="2">
             <h3>Podaj liczbę 60l worków, w które spakowałeś/aś rzeczy:</h3>
-
+            
             <div class="form-group form-group--inline">
               <label>
                 Liczba 60l worków:
                 {{ form.quantity }}
               </label>
             </div>
-
+            
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="button" class="btn next-step" id="second-step">Dalej</button>
             </div>
           </div>
-
+          
           <!-- STEP 3 -->
          <div data-step="3" id="id_institution">
            <h3>Wybierz organizacje, której chcesz pomóc:</h3>
            <div id='ajax'> 
-                <!--SHOULD BE LOADED BY AJAX --> 
+             <!--SHOULD BE LOADED BY AJAX --> 
             </div>           
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="button" class="btn next-step" id="third-step">Dalej</button>
             </div>
           </div>
--
-      
+     
           <!-- STEP 4 -->
           <div data-step="4">
             <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
-
             <div class="form-section form-section--columns" id="pickup-info">
               <div class="form-section--column">
                 <h4>Adres odbioru</h4>
@@ -122,7 +115,7 @@
                 <div class="form-group form-group--inline">
                   <label> Miasto {{ form.city }} </label>
                 </div>
-
+                
                 <div class="form-group form-group--inline">
                   <label>
                     Kod pocztowy {{ form.zip_code }}
@@ -135,21 +128,17 @@
                   </label>
                 </div>
               </div>
-
+              
               <div class="form-section--column">
                 <h4>Termin odbioru</h4>
                 <div class="form-group form-group--column">
                   {{ form.pick_up_date_time }}
                 </div>
-                
-             <!--   <div class="form-group form-group--inline">
-                  <label> Godzina <input type="time" name="time" /> </label>
-                </div>-->
 
                 <div class="form-group form-group--inline">
                   <label>
                     Uwagi dla kuriera
-                    {{form.pick_up_comment}}
+                    {{ form.pick_up_comment }}
                   </label>
                 </div>
               </div>
@@ -179,7 +168,7 @@
                   </li>
                 </ul>
               </div>
-
+              
               <div class="form-section form-section--columns">
                 <div class="form-section--column">
                   <h4>Adres odbioru:</h4>
@@ -190,7 +179,7 @@
                     <li id="phone"></li>
                   </ul>
                 </div>
-
+                
                 <div class="form-section--column">
                   <h4>Termin odbioru:</h4>
                   <ul>
@@ -201,7 +190,7 @@
                 </div>
               </div>
             </div>
-
+            
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="submit" class="btn">Potwierdzam</button>
@@ -210,30 +199,28 @@
         </form>
       </div>
     </section>
+    <script src="{% static 'inkind/js/formValidation.js'%}"></script>
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
       <script>
-      $("#categories-select").change(function () {
+        $("#categories-select").change(function () {
         var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
         var category = []
         $.each($("input[type=checkbox][name=category]:checked"), function(){
             category.push($(this).val());
           });
-        category = category.join(", ")
-       // get the selected category from the HTML input
-
+        category = category.join(", ") // get the selected category from the HTML input
   
-        $.ajax({                       // initialize an AJAX request
-          url: url,
-          type: "POST",                  // set the url of the request (= localhost:8000/ajax/load-institutions/)
+        $.ajax({                // initialize an AJAX request
+          url: url,             // set the url of the request (= localhost:8000/ajax/load-institutions/)
+          type: "POST",         // define method request      
           data: {
-            'category': category,
-            'csrfmiddlewaretoken': '{{ csrf_token }}',    // add the categoryid to the GET parameters
+            'category': category,      // add the category string to the POST parameters
+            'csrfmiddlewaretoken': '{{ csrf_token }}',   // add csrf_token value 
           },
           success: function (data) {   // `data` is the return of the `load_institutions` view function
-            $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server
+            $('#ajax').html(data);     // replace the contents of the institutions input with the data that came from the server
           }
         });
-    
         });
       </script>
 {% endblock %}

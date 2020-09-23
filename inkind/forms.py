@@ -85,8 +85,3 @@ class DonationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['institution'].queryset = Institution.objects.none()
-
-    #def save(self):
-    #    donation = form.save(commit=False)
-    #    donation.user = request.user
-    #    donation.save()

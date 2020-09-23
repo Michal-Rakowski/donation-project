@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Donation, Institution, Category, CustomUser
-from .forms import UserCreationForm
+from .forms import UserCreationForm, DonationForm
 
 
 class LandingPageView(generic.ListView):
@@ -47,6 +47,7 @@ class CustomLogin(views.LoginView):
     Subclasses Django built-in LoginView overriding POST with redirect to registration view 
     if user does not exist, redisplays login form otherwise
     """
+    
     def post(self, request, *args, **kwargs):
         """
         Handle POST requests: instantiate a form instance with the passed
@@ -62,8 +63,6 @@ class CustomLogin(views.LoginView):
             else:
                 return self.form_invalid(form)
 
-from .forms import DonationForm
-from .models import Donation
 
 class AddDonationView(LoginRequiredMixin, generic.FormView):
     """
@@ -96,18 +95,22 @@ class AddDonationView(LoginRequiredMixin, generic.FormView):
 
 
 class Confirmation(views.TemplateView):
+    """
+    Displays confirmation upon successful donation-form submittion
+    """
     template_name = 'inkind/form-confirmation.html'
 
 
 
 def load_institutions(request):
     """Filtering Institutions on selected categories"""
-    #getting categories string
     if request.method == 'POST':
+        #getting categories string send throught AJAX call in form '1, 2, 3' etc
         category = request.POST.get('category')
-        print(category)
         if category is not None:
+            #converting to int list
             ids = list(map(int, [i for i in category.split(',')]))
+            ## Get intitution entries with selected ids 
             institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
 
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})

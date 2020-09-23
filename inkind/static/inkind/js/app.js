@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
 
       // Form submit
-     // this.$form.querySelector("form").addEventListener("submit", e => this.submit(e));
+    //  this.$form.querySelector("form").addEventListener("submit", e => this.submit(e));
     }
 
     /**
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function() {
      * TODO: validation, send data to server
      */
     //submit(e) {
-    //  //e.preventDefault();
+    //  e.preventDefault();
     //  this.currentStep++;
     //  this.updateForm();
     //}
