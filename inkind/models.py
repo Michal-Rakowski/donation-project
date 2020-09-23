@@ -14,6 +14,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Kategoria'
+        verbose_name_plural = 'Kategorie'
+
 
 class Institution(models.Model):
 
@@ -30,6 +34,10 @@ class Institution(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    class Meta:
+        verbose_name = 'Organizacja'
+        verbose_name_plural = 'Zaufane Organizację'
 
 class CustomUser(AbstractBaseUser):
     """Custom User Model 
@@ -89,6 +97,10 @@ class CustomUser(AbstractBaseUser):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    class Meta:
+        verbose_name = 'Użytkownik'
+        verbose_name_plural = 'Użytkownicy'
+
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=True, null=True)
@@ -104,4 +116,8 @@ class Donation(models.Model):
 
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
+
+    class Meta:
+        verbose_name = 'Darowizna'
+        verbose_name_plural = 'Przekazane Dary'
 
