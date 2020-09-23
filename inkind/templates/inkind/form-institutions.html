@@ -2,12 +2,12 @@
 {% for institution in institutions %}
   <div class="form-group form-group--checkbox">
     <label>
-      <input type="radio" name="organization" value="{{institution.id}}" />
+      <input type="radio" name="organization" value="{{institution.id}}" data-desc="{{institution.name}}" />
       <span class="checkbox radio"></span>
       <span class="description">
-        <div class="title"></div>
+        <div class="title"> {{ institution.get_institution_type_display }} {{ institution.name }}</div>
         <div class="subtitle">
-        {{institution}}
+        {{ institution.description }}
         </div>
       </span>
     </label>

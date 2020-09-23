@@ -53,7 +53,7 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="form-confirmation.html" method="post" id="donationForm" institutions-url="{% url 'ajax_load' %}">
+        <form action="" method="POST" id="donationForm" institutions-url="{% url 'ajax_load' %}">
           {% csrf_token%}
         
           <!-- STEP 1: class .active is switching steps -->
@@ -62,100 +62,90 @@
             {% for category in categories %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input
-                  type="checkbox"
-                  name="category"
-                  value="{{category.id}}"
-                />
+                <input type="checkbox" name="category" value="{{category.id}}" data-category="{{category.name}}"/>
                 <span class="checkbox" name="category" id="{{category.id}}"></span>
                 <span class="description">{{ category.name }}</span>
               </label>
             </div>
             {% endfor %}
-          <div class="form-group form-group--buttons">
-            <button type="button" class="btn next-step" id="first-step">Dalej</button>
-          </div>
-          </div>                       
-          <script src="{% static 'inkind/js/formTest.js'%}"></script>
+            <div class="form-group form-group--buttons">
+              <button type="button" class="btn next-step" id="first-step">Dalej</button>
+            </div>
+          </div>     
+
           <!-- STEP 2 -->
           <div data-step="2">
             <h3>Podaj liczbę 60l worków, w które spakowałeś/aś rzeczy:</h3>
-
+            
             <div class="form-group form-group--inline">
               <label>
                 Liczba 60l worków:
-                {{form.quantity}}
+                {{ form.quantity }}
               </label>
             </div>
-
+            
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="button" class="btn next-step" id="second-step">Dalej</button>
             </div>
           </div>
-
+          
           <!-- STEP 3 -->
          <div data-step="3" id="id_institution">
            <h3>Wybierz organizacje, której chcesz pomóc:</h3>
            <div id='ajax'> 
-                <!--SHOULD BE LOADED BY AJAX CALL--> 
+             <!--SHOULD BE LOADED BY AJAX --> 
             </div>           
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="third-step">Dalej</button>
             </div>
           </div>
--
-      
+     
           <!-- STEP 4 -->
           <div data-step="4">
             <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
-
-            <div class="form-section form-section--columns">
+            <div class="form-section form-section--columns" id="pickup-info">
               <div class="form-section--column">
                 <h4>Adres odbioru</h4>
                 <div class="form-group form-group--inline">
-                  <label> Ulica <input type="text" name="address" /> </label>
+                  <label> Ulica {{ form.address }}</label>
                 </div>
 
                 <div class="form-group form-group--inline">
-                  <label> Miasto <input type="text" name="city" /> </label>
+                  <label> Miasto {{ form.city }} </label>
                 </div>
-
+                
                 <div class="form-group form-group--inline">
                   <label>
-                    Kod pocztowy <input type="text" name="postcode" />
+                    Kod pocztowy {{ form.zip_code }}
                   </label>
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
-                    Numer telefonu <input type="phone" name="phone" />
+                    Numer telefonu {{ form.phone_number }}
                   </label>
                 </div>
               </div>
-
+              
               <div class="form-section--column">
                 <h4>Termin odbioru</h4>
-                <div class="form-group form-group--inline">
-                  <label> Data <input type="date" name="data" /> </label>
-                </div>
-
-                <div class="form-group form-group--inline">
-                  <label> Godzina <input type="time" name="time" /> </label>
+                <div class="form-group form-group--column">
+                  {{ form.pick_up_date_time }}
                 </div>
 
                 <div class="form-group form-group--inline">
                   <label>
                     Uwagi dla kuriera
-                    <textarea name="more_info" rows="5"></textarea>
+                    {{ form.pick_up_comment }}
                   </label>
                 </div>
               </div>
             </div>
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
-              <button type="button" class="btn next-step">Dalej</button>
+              <button type="button" class="btn next-step" id="summary-step">Dalej</button>
             </div>
           </div>
 
@@ -169,42 +159,38 @@
                 <ul>
                   <li>
                     <span class="icon icon-bag"></span>
-                    <span class="summary--text"
-                    >4 worki ubrań w dobrym stanie dla dzieci</span
-                    >
+                    <span class="summary--text" id="summarybox1"> </span>
                   </li>
                   
                   <li>
                     <span class="icon icon-hand"></span>
-                    <span class="summary--text"
-                    >Dla fundacji "Mam marzenie" w Warszawie</span
-                    >
+                    <span class="summary--text" id="summarybox2"></span>
                   </li>
                 </ul>
               </div>
-
+              
               <div class="form-section form-section--columns">
                 <div class="form-section--column">
                   <h4>Adres odbioru:</h4>
-                  <ul>
-                    <li>Prosta 51</li>
-                    <li>Warszawa</li>
-                    <li>99-098</li>
-                    <li>123 456 789</li>
+                  <ul id="summaryaddress">
+                    <li id="address"></li>
+                    <li id="city"></li>
+                    <li id="zip"></li>
+                    <li id="phone"></li>
                   </ul>
                 </div>
-
+                
                 <div class="form-section--column">
                   <h4>Termin odbioru:</h4>
                   <ul>
-                    <li>13/12/2018</li>
-                    <li>15:40</li>
-                    <li>Brak uwag</li>
+                    <li id="date"></li>
+                    <li id="time"></li>
+                    <li id="comments"></li>
                   </ul>
                 </div>
               </div>
             </div>
-
+            
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
               <button type="submit" class="btn">Potwierdzam</button>
@@ -213,27 +199,28 @@
         </form>
       </div>
     </section>
+    <script src="{% static 'inkind/js/formValidation.js'%}"></script>
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
       <script>
-      $("#categories-select").change(function () {
+        $("#categories-select").change(function () {
         var url = $("#donationForm").attr("institutions-url");  // get the url of the `load_institution` view
-        var category = ''
+        var category = []
         $.each($("input[type=checkbox][name=category]:checked"), function(){
-            category = category + ($(this).val());
+            category.push($(this).val());
           });
-       // get the selected category from the HTML input
-
+        category = category.join(", ") // get the selected category from the HTML input
   
-        $.ajax({                       // initialize an AJAX request
-          url: url,                 // set the url of the request (= localhost:8000/ajax/load-institutions/)
+        $.ajax({                // initialize an AJAX request
+          url: url,             // set the url of the request (= localhost:8000/ajax/load-institutions/)
+          type: "POST",         // define method request      
           data: {
-            'category': category,       // add the categoryid to the GET parameters
+            'category': category,      // add the category string to the POST parameters
+            'csrfmiddlewaretoken': '{{ csrf_token }}',   // add csrf_token value 
           },
           success: function (data) {   // `data` is the return of the `load_institutions` view function
-            $('#ajax').html(data);  // replace the contents of the institutions input with the data that came from the server
+            $('#ajax').html(data);     // replace the contents of the institutions input with the data that came from the server
           }
         });
-    
         });
       </script>
 {% endblock %}

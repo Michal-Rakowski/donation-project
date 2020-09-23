@@ -58,21 +58,25 @@ class CustomLoginForm(AuthenticationForm):
     username = forms.EmailField(widget=forms.EmailInput(attrs={'class':'validate','placeholder': 'Email'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder':'Hasło'}))
 
+from django.utils import timezone
+
+def pick_up_date():
+    return timezone.now() + timezone.timedelta(days=1)
 
 class DonationForm(forms.ModelForm):
     """
     Form for submitting donation
     """
-    #categories = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple, 
-                                                #queryset=Category.objects.all())
-    #institution = forms.ModelChoiceField(widget=forms.RadioSelect(), required=True, queryset=Institution.objects.all())
     quantity = forms.IntegerField(required=True, label='Liczba 60l worków: ', initial=1)
-    address = forms.CharField(widget=forms.TextInput(), max_length=150, required=True)
-    phone_number = forms.CharField(widget=forms.TextInput(), required=True)
-    city = forms.CharField(widget=forms.TextInput(), required=True)
-    zip_code = forms.CharField(widget=forms.TextInput(), required=True)
-    pick_up_date_time = forms.SplitDateTimeField(widget=forms.SplitDateTimeWidget(), required=True)
-    pick_up_comment = forms.CharField(widget=forms.TextInput())
+    address = forms.CharField(widget=forms.TextInput, max_length=150, required=True)
+    phone_number = forms.CharField(widget=forms.TextInput, required=True)
+    city = forms.CharField(widget=forms.TextInput, required=True)
+    zip_code = forms.CharField(widget=forms.TextInput, required=True)
+    pick_up_date_time = forms.SplitDateTimeField(
+        initial=pick_up_date,
+        required=True,
+        widget=forms.SplitDateTimeWidget)
+    pick_up_comment = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:
         model = Donation
@@ -81,8 +85,3 @@ class DonationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['institution'].queryset = Institution.objects.none()
-
-    def save(self):
-        donation = form.save(commit=False)
-        donation.user = request.user
-        donation.save()

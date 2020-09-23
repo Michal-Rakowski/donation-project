@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Donation, Institution, Category, CustomUser
-from .forms import UserCreationForm
+from .forms import UserCreationForm, DonationForm
 
 
 class LandingPageView(generic.ListView):
@@ -47,6 +47,7 @@ class CustomLogin(views.LoginView):
     Subclasses Django built-in LoginView overriding POST with redirect to registration view 
     if user does not exist, redisplays login form otherwise
     """
+    
     def post(self, request, *args, **kwargs):
         """
         Handle POST requests: instantiate a form instance with the passed
@@ -62,31 +63,54 @@ class CustomLogin(views.LoginView):
             else:
                 return self.form_invalid(form)
 
-from .forms import DonationForm
-from .models import Donation
-class AddDonationView(LoginRequiredMixin, generic.CreateView):
+
+class AddDonationView(LoginRequiredMixin, generic.FormView):
     """
     Displays form for submitting a donation
     """
-    model = Donation
     template_name = 'inkind/form.html'
     form_class = DonationForm
-   
-    def get_context_data(self, **kwargs):
+    extra_context = {'categories': Category.objects.all().order_by('id')}
+    success_url = reverse_lazy('form-confirmation')
+
+    def form_valid(self, form):
         """
-        Passes context data  to the template for rendering        
+        Sets current user to his donation, sets institution for created donations
+        and creates donation.
+        Add selected categories to donation
         """
-        context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all().order_by('id')
-        #context['institutions'] = Institution.objects.all()
-        return context
-            
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        org = self.request.POST.get('organization')
+        institution = Institution.objects.get(pk=int(org))
+        self.object.institution = institution
+        self.object.save()
+        category = self.request.POST.getlist('category')
+        categories_id = list(map(int, category))
+        for pk in categories_id:
+            cat = Category.objects.get(pk=pk)
+            self.object.categories.add(cat)
+    
+        return super().form_valid(form)
+
+
+class Confirmation(views.TemplateView):
+    """
+    Displays confirmation upon successful donation-form submittion
+    """
+    template_name = 'inkind/form-confirmation.html'
+
+
+
 def load_institutions(request):
-    category = request.GET.get('category')
-    #print(category)
-    if category is not None:
-        ids = [int(i) for i in category]
-        #print(ids)
-        institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
+    """Filtering Institutions on selected categories"""
+    if request.method == 'POST':
+        #getting categories string send throught AJAX call in form '1, 2, 3' etc
+        category = request.POST.get('category')
+        if category is not None:
+            #converting to int list
+            ids = list(map(int, [i for i in category.split(',')]))
+            ## Get intitution entries with selected ids 
+            institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
 
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
