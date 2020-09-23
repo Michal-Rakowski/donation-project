@@ -25,8 +25,9 @@ document.addEventListener("DOMContentLoaded", function(){
     let quantity = document.querySelector('input#id_quantity');
     let step2button = document.querySelector('#second-step');
     quantity.addEventListener('change', function() {
-        if (quantity.value < 1) {
+        if (quantity.value < 1 || quantity.value > 100 ) {
             step2button.disabled = true
+            document.getElementById('quantity-help-text').innerHTML = "Ilość worków nie może byc mniejsza od 1 lub większą od 100"
         } else {
             step2button.disabled = false
          }
@@ -85,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
 
-        document.getElementById('summarybox1').innerHTML =  quantity + ' worki ' + cats
+        document.getElementById('summarybox1').innerHTML =  quantity + ' worki w kateg.: ' + cats
         document.getElementById('summarybox2').innerText = "Dla " + org;
         document.getElementById('address').innerHTML = address
         document.getElementById('city').innerHTML = city
