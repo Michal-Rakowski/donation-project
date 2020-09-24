@@ -27,7 +27,7 @@ class LandingPageView(generic.ListView):
         """
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
-        context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution'))['total_institutions']
+        context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
         return context
 
 
@@ -114,3 +114,38 @@ def load_institutions(request):
             institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
 
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
+
+
+class ProfileView(LoginRequiredMixin, generic.ListView):
+    """
+    User profile page. 
+    Lists donations of the currently logged in user
+    Added POST method for Ajax donation status update
+    """
+    template_name = 'inkind/profile.html'
+    model = Donation
+    context_object_name = 'donations'
+    paginate_by = 7
+
+
+    def get_queryset(self, *args, **kwargs):
+        """
+        Returns only donations of the current user
+        """
+        queryset = self.model.objects.filter(user=self.request.user).order_by('status', '-pick_up_date_time', 'pk')
+        return queryset
+    
+    def post(self, request, *args, **kwargs):
+        return ajax_status_change(request)
+
+
+def ajax_status_change(request):
+    """
+    Changes Status of the donation to True:'(ODEBRANE)'
+    """
+    if request.method =='POST':
+        status = request.POST.get('status', None)
+        donation = Donation.objects.get(pk=status)
+        donation.status = True
+        donation.save()
+        return HttpResponseRedirect(reverse_lazy('user-profile'))

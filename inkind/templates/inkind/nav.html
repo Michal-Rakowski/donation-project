@@ -6,7 +6,7 @@
       <li class="logged-user">
         Witaj {{user.first_name}}
         <ul class="dropdown">
-          <li><a href="#">Profil</a></li>
+          <li><a href="{% url 'user-profile' %}">Profil</a></li>
           <li><a href="#">Ustawienia</a></li>
           {% if user.is_admin %}
           <li><a href="{% url 'admin:index' %}">Panel administracyjny</a></li>
