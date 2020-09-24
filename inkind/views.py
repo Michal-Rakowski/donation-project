@@ -118,7 +118,9 @@ def load_institutions(request):
 
 class ProfileView(generic.ListView):
     """
-    User profile page
+    User profile page. 
+    Lists donations of the currently logged in user
+    Added POST method for Ajax donation status update
     """
     template_name = 'inkind/profile.html'
     model = Donation
@@ -131,16 +133,15 @@ class ProfileView(generic.ListView):
         """
         queryset = self.model.objects.filter(user=self.request.user).order_by('-id')
         return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
     
     def post(self, request, *args, **kwargs):
         return ajax_status_change(request)
 
-from django.http import JsonResponse
+
 def ajax_status_change(request):
+    """
+    Changes Status of the donation to True:'(ODEBRANE)'
+    """
     if request.method =='POST':
         status = request.POST.get('status', False)
        # print(status)
