@@ -26,8 +26,8 @@
                 <thead>
                     <tr class="d-flex">
                         <th class="col-3">Nazwa Organizacji</th>
-                        <th class="col-2">ilość worków</th>
-                        <th class="col-2">Data przekazania daru</th>
+                        <th class="col-2">Worki</th>
+                        <th class="col-2">Planowane przekazanie</th>
                         <th>Status</th>
                         <th class="col-3">Kategorie</th>
                         <th>Zmiana statusu</th>
@@ -35,18 +35,28 @@
                 </thead>
                 <tbody>
                     {% for donation in donations %}
+                    {% if donation.status is True%}
+                    <tr class="d-flex" style="color:lightsteelblue">
+                    {% else %}
                     <tr class="d-flex">
+                    {% endif %}
                         <td class="col-3">{{ donation.institution }}</a></td>
                         <td class="col-2">{{ donation.quantity }}</td>
                         <td class="col-2">{{ donation.pick_up_date_time|date:"j E Y" }}</td>
                         <td>{{ donation.status|yesno:"Odebrano, Do odbioru" }}</td>
                         <td>{% for category in donation.categories.all%}{% include "inkind/comma.html" %}{{ category }}  {% endfor %}</td>
+                        {% if donation.status is True%}
+                        <td>
+                            <p style='font-size: medium;text-align: left;'>Odebrano</p>
+                        </td>
+                        {% else %}
                         <td>
                             <form action="" method="POST" id="{{donation.id}}" status-url="{% url 'status-update' %}">
                                 {% csrf_token %}
                               <button id="status-change" class="btn" name="status" type="submit" value="{{donation.id}}">Zaznacz odebranie</button>
                             </form>
-                        </td>              
+                        </td>
+                        {% endif %}             
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -82,29 +92,31 @@
         
     </div>
     <script>
-        $("#status-change.btn").on('submit', function(event){
-            event.preventDefault();
-            $(this).prop('disabled', true); // NOT WORKING ??
-            //var donation_id = $(this).val();
+        $("#status-change.btn").on('click', function(event){
+            //event.preventDefault();
+            
             var url = $("form").attr("status-url")
-            var status = true
             var token = $(this).prev(':hidden').val()
+           // var button = $(this);
+           // var row = $(this).parent().parent().css('color', '#cbcebf');
+            var status = $(this).val()
+            $(this).submit()
 
             $.ajax({
                 url : url, // the endpoint
                 type : "POST", // http method
                 data : { 
-                    //'donation_id' : donation_id,
                     'csrfmiddlewaretoken': token,
                     'status': status // data sent with the post request
                     },
                 // handle a successful response
                 dataType: 'json',
                 success : function(data) {  
-                    $("button:contains(Odebrane)").attr("disabled", true) // NOT WORKING YET
+                // button.hide(); 
                 },
             });
             });
+
     </script>
   </header>
 

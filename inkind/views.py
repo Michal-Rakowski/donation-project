@@ -116,7 +116,7 @@ def load_institutions(request):
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
 
 
-class ProfileView(generic.ListView):
+class ProfileView(LoginRequiredMixin, generic.ListView):
     """
     User profile page. 
     Lists donations of the currently logged in user
@@ -127,11 +127,12 @@ class ProfileView(generic.ListView):
     context_object_name = 'donations'
     paginate_by = 7
 
+
     def get_queryset(self, *args, **kwargs):
         """
         Returns only donations of the current user
         """
-        queryset = self.model.objects.filter(user=self.request.user).order_by('-id')
+        queryset = self.model.objects.filter(user=self.request.user).order_by('status', '-pick_up_date_time', 'pk')
         return queryset
     
     def post(self, request, *args, **kwargs):
@@ -147,5 +148,4 @@ def ajax_status_change(request):
         donation = Donation.objects.get(pk=status)
         donation.status = True
         donation.save()
-        context = {'donations': Donation.objects.filter(user=request.user).order_by('-id')}
         return HttpResponseRedirect(reverse_lazy('user-profile'))
