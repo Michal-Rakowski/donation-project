@@ -143,15 +143,9 @@ def ajax_status_change(request):
     Changes Status of the donation to True:'(ODEBRANE)'
     """
     if request.method =='POST':
-        status = request.POST.get('status', False)
-       # print(status)
-        #donation_id = request.POST.get('donation_id')
-        #print(donation_id)
-        try:
-            donation = Donation.objects.get(pk=status)
-            donation.status = True
-            donation.save()
-        except Exception as e:
-            pass
+        status = request.POST.get('status', None)
+        donation = Donation.objects.get(pk=status)
+        donation.status = True
+        donation.save()
         context = {'donations': Donation.objects.filter(user=request.user).order_by('-id')}
-        return render(request, 'inkind/profile.html', context)
+        return HttpResponseRedirect(reverse_lazy('user-profile'))
