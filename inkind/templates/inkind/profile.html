@@ -94,11 +94,10 @@
     <script>
         $("#status-change.btn").on('click', function(event){
             //event.preventDefault();
-            
             var url = $("form").attr("status-url")
             var token = $(this).prev(':hidden').val()
            // var button = $(this);
-           // var row = $(this).parent().parent().css('color', '#cbcebf');
+   
             var status = $(this).val()
             $(this).submit()
 
@@ -112,7 +111,6 @@
                 // handle a successful response
                 dataType: 'json',
                 success : function(data) {  
-                // button.hide(); 
                 },
             });
             });
