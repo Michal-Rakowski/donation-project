@@ -1,0 +1,17 @@
+{% extends 'inkind/base.html' %}
+{% load static %}
+{% block content %}
+  <header class="header--form-page">
+      {% include 'inkind/nav.html'%}
+        
+      <div class="slogan container container--90">
+          <form method="POST">
+            {% csrf_token %}
+              {% for field in form.visible_fields %}
+                {{ field }}
+              {% endfor %}   
+            <button class="btn" type="submit">Zmień status</button> 
+        </form>
+      </div>
+    </header>
+{% endblock %}

@@ -80,8 +80,19 @@ class DonationForm(forms.ModelForm):
 
     class Meta:
         model = Donation
-        exclude = ('user', 'categories' )
+        exclude = ('user', 'categories', 'status')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['institution'].queryset = Institution.objects.none()
+
+
+class DonationStatusForm(forms.ModelForm):
+    """
+    Form for users allowing to change status of the particular donation
+    True: if donation has been picked up 
+    False: otherwise
+    """
+    class Meta: 
+        model = Donation
+        fields = ('status',)

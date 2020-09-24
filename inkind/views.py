@@ -27,7 +27,7 @@ class LandingPageView(generic.ListView):
         """
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
-        context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution'))['total_institutions']
+        context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
         return context
 
 
@@ -114,3 +114,43 @@ def load_institutions(request):
             institutions = Institution.objects.filter(categories__id__in=ids).distinct().order_by('name')
 
     return render(request, 'inkind/form-institutions.html', {'institutions': institutions})
+
+
+class ProfileView(generic.ListView):
+    """
+    User profile page
+    """
+    template_name = 'inkind/profile.html'
+    model = Donation
+    context_object_name = 'donations'
+    paginate_by = 7
+
+    def get_queryset(self, *args, **kwargs):
+        """
+        Returns only donations of the current user
+        """
+        queryset = self.model.objects.filter(user=self.request.user).order_by('-id')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        return ajax_status_change(request)
+
+from django.http import JsonResponse
+def ajax_status_change(request):
+    if request.method =='POST':
+        status = request.POST.get('status', False)
+       # print(status)
+        #donation_id = request.POST.get('donation_id')
+        #print(donation_id)
+        try:
+            donation = Donation.objects.get(pk=status)
+            donation.status = True
+            donation.save()
+        except Exception as e:
+            pass
+        context = {'donations': Donation.objects.filter(user=request.user).order_by('-id')}
+        return render(request, 'inkind/profile.html', context)

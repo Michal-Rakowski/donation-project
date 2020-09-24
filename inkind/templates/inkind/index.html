@@ -94,7 +94,7 @@
             </div>
 
             <div class="col"><div class="text">{% for category in org.categories.all %}
-              {{ category }}, 
+              {% include "inkind/comma.html" %}{{ category }} 
             {% endfor %}</div></div>
           </li>
         </ul>

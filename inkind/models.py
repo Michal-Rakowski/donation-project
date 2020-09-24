@@ -113,7 +113,7 @@ class Donation(models.Model):
     zip_code = models.CharField(max_length=15)
     pick_up_date_time = models.DateTimeField()
     pick_up_comment = models.CharField(max_length=200)
-
+    status = models.BooleanField(default=False)
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
 

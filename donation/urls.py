@@ -22,6 +22,7 @@ from inkind.forms import CustomLoginForm
 
 urlpatterns = [
     path('', views.LandingPageView.as_view(), name='landing-page'),
+    path('profile/', views.ProfileView.as_view(), name='user-profile'),
     path('donate/', views.AddDonationView.as_view(), name='add-donation'),
     path('donate/confirmation/', views.Confirmation.as_view(), name='form-confirmation'),
     path('register/', views.RegistrationView.as_view(), name='register'),
@@ -30,5 +31,6 @@ urlpatterns = [
                                             name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('ajax/load-institutions/', views.load_institutions, name='ajax_load'),
+    path('ajax/change_status/', views.ajax_status_change, name='status-update'),
     path('admin/', admin.site.urls),
 ]

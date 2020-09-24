@@ -1,0 +1,111 @@
+{% extends 'inkind/base.html' %}
+{% load static %}
+{% block content %}
+  <header class="header--form-page">
+      {% include 'inkind/nav.html'%}
+    <div class="container container--70" style="text-align: center;font-size: 20px; margin-top: 70px;">  
+        <div class="about-us--text">
+            <table>
+                <tbody>
+                    <tr class="d-flex">
+                        <td class="row-2">Imię: {{ user.first_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="row-2">Nazwisko: {{ user.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="row-3">Email: {{ user.email }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a class="btn btn-success" href="" role="button">Edytuj Profil</a>
+        </div>
+        <div class="about-us--text">
+            {% if donations %}
+            <table>
+                <thead>
+                    <tr class="d-flex">
+                        <th class="col-3">Nazwa Organizacji</th>
+                        <th class="col-2">ilość worków</th>
+                        <th class="col-2">Data przekazania daru</th>
+                        <th>Status</th>
+                        <th class="col-3">Kategorie</th>
+                        <th>Zmiana statusu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donation in donations %}
+                    <tr class="d-flex">
+                        <td class="col-3">{{ donation.institution }}</a></td>
+                        <td class="col-2">{{ donation.quantity }}</td>
+                        <td class="col-2">{{ donation.pick_up_date_time|date:"j E Y" }}</td>
+                        <td>{{ donation.status|yesno:"Odebrano, Do odbioru" }}</td>
+                        <td>{% for category in donation.categories.all%}{% include "inkind/comma.html" %}{{ category }}  {% endfor %}</td>
+                        <td>
+                            <form action="" method="POST" id="{{donation.id}}" status-url="{% url 'status-update' %}">
+                                {% csrf_token %}
+                              <button id="status-change" class="btn" name="status" type="submit" value="{{donation.id}}">Zaznacz odebranie</button>
+                            </form>
+                        </td>              
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="d-block">
+                    <p><h1>Przekaż swój pierwszy dar</h1></p>
+                    <a class="btn btn-success" href="{% url 'add-donation' %}" role="button">Dodaj darowiznę</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+            <a class="btn btn-outline-dark mb-4" href="?page=1">Pierwsza</a>
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.previous_page_number }}">Poprzednia</a>
+            {% endif%}
+        
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <a class="btn btn-dark mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-dark mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+        
+            {% if page_obj.has_next %}
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.next_page_number }}">Następna</a>
+            <a class="btn btn-outline-dark mb-4" href="?page={{ page_obj.paginator.num_pages }}">Ostatnia</a>
+            {% endif%}
+        
+        {% endif%}
+        
+    </div>
+    <script>
+        $("#status-change.btn").on('submit', function(event){
+            event.preventDefault();
+            $(this).prop('disabled', true); // NOT WORKING ??
+            //var donation_id = $(this).val();
+            var url = $("form").attr("status-url")
+            var status = true
+            var token = $(this).prev(':hidden').val()
+
+            $.ajax({
+                url : url, // the endpoint
+                type : "POST", // http method
+                data : { 
+                    //'donation_id' : donation_id,
+                    'csrfmiddlewaretoken': token,
+                    'status': status // data sent with the post request
+                    },
+                // handle a successful response
+                dataType: 'json',
+                success : function(data) {  
+                    $("button:contains(Odebrane)").attr("disabled", true) // NOT WORKING YET
+                },
+            });
+            });
+    </script>
+  </header>
+
+{% endblock %}
