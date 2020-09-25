@@ -6,9 +6,11 @@ from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect 
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.contrib.auth.hashers import check_password
 
 from .models import Donation, Institution, Category, CustomUser
-from .forms import UserCreationForm, DonationForm
+from .forms import UserCreationForm, DonationForm, PasswordForm
 
 
 class LandingPageView(generic.ListView):
@@ -29,6 +31,19 @@ class LandingPageView(generic.ListView):
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
         context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
         return context
+
+    def post(self, request, *args, **kwargs):
+        """ 
+        Handles Password Form for Editing User Profile
+        """
+        password_form = PasswordForm(request.POST)
+        password = self.request.POST.get('password')
+        user_password = self.request.user.password
+        if check_password(password, user_password):
+            return HttpResponseRedirect(reverse_lazy('profile-update', kwargs={'pk': self.request.user.pk}))
+        else:
+            messages.add_message(self.request, messages.ERROR, 'Niepoprawne hasło.')
+            return HttpResponseRedirect(reverse_lazy('user-profile')) 
 
 
 class RegistrationView(SuccessMessageMixin, generic.CreateView):
@@ -135,8 +150,22 @@ class ProfileView(LoginRequiredMixin, generic.ListView):
         queryset = self.model.objects.filter(user=self.request.user).order_by('status', '-pick_up_date_time', 'pk')
         return queryset
     
+
     def post(self, request, *args, **kwargs):
-        return ajax_status_change(request)
+        """
+        Redirects to ajax function if request is Ajax. 
+        Else handles Password Form for Editing User Profile
+        """
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':            
+            return ajax_status_change(request)
+        else:
+            password_form = PasswordForm(request.POST)
+            password = self.request.POST.get('password')
+            user_password = self.request.user.password
+            if check_password(password, user_password):
+                return HttpResponseRedirect(reverse_lazy('profile-update', kwargs={'pk': self.request.user.pk}))
+            else:
+                return HttpResponseRedirect(reverse_lazy('user-profile')) 
 
 
 def ajax_status_change(request):
@@ -149,3 +178,36 @@ def ajax_status_change(request):
         donation.status = True
         donation.save()
         return HttpResponseRedirect(reverse_lazy('user-profile'))
+
+from django.contrib.auth.forms import PasswordChangeForm
+
+class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateView):
+    """
+    User profile update view
+    """
+    template_name = 'inkind/profile_update.html'
+    model = CustomUser
+    fields = ['first_name', 'last_name','email']
+    success_message = "Twój profil został zaktualizowany pomyślnie"
+    success_url = reverse_lazy('user-profile')
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super().get_initial()
+        initial['first_name'] = self.request.user.first_name
+        initial['last_name'] = self.request.user.last_name
+        initial['email'] = self.request.user.email
+        return initial
+
+    def get_context_data(self, **kwargs):
+        """
+        Calculates total of donated bags, total of supported institutions and
+        passes its value to the template
+        """
+        context = super().get_context_data(**kwargs)
+        context['change_password'] = PasswordChangeForm(user=self.request.user)
+        return context  
+
+#class PasswordChange(generic)

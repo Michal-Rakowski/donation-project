@@ -1,0 +1,61 @@
+{% extends 'inkind/base.html' %}
+{% load static %}
+{% block content %}
+  <header class="header--form-page">
+      {% include 'inkind/nav.html'%}
+    <div class="container container--70" style="text-align: center;font-size: 20px; margin-top: 70px;">  
+    <h1>Edytuj swoje dane</h1>
+      <form method="POST" style="float: left;margin-left: 15em;">
+        {% csrf_token %}
+        {% if form.errors %}
+          {% for field in form %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+          {% endfor %}
+
+          {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+              <strong>{{ error|escape }}</strong>
+            </div>
+          {% endfor %}
+        {% endif %}
+      
+        <div class="form-group">
+          {% for field in form.hidden_fields %}
+            <div class="form-group">
+              {{ field }} 
+            </div>
+          {% endfor %}
+
+          {% for field in form.visible_fields %}
+            <label> {{field.label}}</label>
+            <div class="form-group">
+              {{ field }}
+          </div>
+          {% endfor %}
+        <br>
+        <button class="btn" type="submit">Edytuj Dane Osobowe</button> 
+        
+        </div>
+      </form> 
+      <form method="POST" action="{% url 'password-reset' user.id %}">
+        {% csrf_token %}
+        {% for field in change_password.visible_fields %}
+        <div class="form-group">
+              <table>
+                <tbody>
+                  <label>{{field.label}}</label>
+                  <div class="form-group">{{ field }}</div>
+                </tbody>
+              </table>
+            {% endfor %}
+            <br>
+            <button class="btn" type="submit">Zmien Haslo Dostępu</button>
+          </div>   
+      </form>
+    </div>
+  </header>
+{% endblock %}

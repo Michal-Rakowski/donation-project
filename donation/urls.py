@@ -17,12 +17,18 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from inkind import views
+from django.urls import reverse, reverse_lazy
+from django.contrib.auth.decorators import login_required
 
 from inkind.forms import CustomLoginForm
 
 urlpatterns = [
     path('', views.LandingPageView.as_view(), name='landing-page'),
     path('profile/', views.ProfileView.as_view(), name='user-profile'),
+    path('profile/update/<int:pk>', views.ProfileUpdateView.as_view(), name='profile-update'),
+    path('profile/update/<int:pk>/password-reset/', auth_views.PasswordChangeView.as_view(template_name='inkind/password_change.html',
+                                                        success_url=reverse_lazy('user-profile')), 
+                                                        name='password-reset'),
     path('donate/', views.AddDonationView.as_view(), name='add-donation'),
     path('donate/confirmation/', views.Confirmation.as_view(), name='form-confirmation'),
     path('register/', views.RegistrationView.as_view(), name='register'),
@@ -34,3 +40,4 @@ urlpatterns = [
     path('ajax/change_status/', views.ajax_status_change, name='status-update'),
     path('admin/', admin.site.urls),
 ]
+#my_new_changed_password51

@@ -96,3 +96,10 @@ class DonationStatusForm(forms.ModelForm):
     class Meta: 
         model = Donation
         fields = ('status',)
+
+
+class PasswordForm(forms.Form):
+    """
+    Form for accessing user profile update view
+    """
+    password = forms.CharField(widget=forms.PasswordInput)   
