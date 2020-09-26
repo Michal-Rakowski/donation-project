@@ -80,7 +80,7 @@ class DonationForm(forms.ModelForm):
 
     class Meta:
         model = Donation
-        exclude = ('user', 'categories', 'status')
+        exclude = ('user', 'categories', 'status', 'status_change')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

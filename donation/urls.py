@@ -25,9 +25,8 @@ from inkind.forms import CustomLoginForm
 urlpatterns = [
     path('', views.LandingPageView.as_view(), name='landing-page'),
     path('profile/', views.ProfileView.as_view(), name='user-profile'),
-    path('profile/update/<int:pk>', views.ProfileUpdateView.as_view(), name='profile-update'),
-    path('profile/update/<int:pk>/password-reset/', auth_views.PasswordChangeView.as_view(template_name='inkind/password_change.html',
-                                                        success_url=reverse_lazy('user-profile')), 
+    path('profile/update/<int:pk>/', views.ProfileUpdateView.as_view(), name='profile-update'),
+    path('profile/update/password-change/', views.CustomPasswordChangeView.as_view(), 
                                                         name='password-reset'),
     path('donate/', views.AddDonationView.as_view(), name='add-donation'),
     path('donate/confirmation/', views.Confirmation.as_view(), name='form-confirmation'),
@@ -40,4 +39,3 @@ urlpatterns = [
     path('ajax/change_status/', views.ajax_status_change, name='status-update'),
     path('admin/', admin.site.urls),
 ]
-#my_new_changed_password51
