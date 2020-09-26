@@ -26,7 +26,7 @@ urlpatterns = [
     path('', views.LandingPageView.as_view(), name='landing-page'),
     path('profile/', views.ProfileView.as_view(), name='user-profile'),
     path('profile/update/<int:pk>/', views.ProfileUpdateView.as_view(), name='profile-update'),
-    path('profile/update/password-reset/', views.CustomPasswordChangeView.as_view(), 
+    path('profile/update/password-change/', views.CustomPasswordChangeView.as_view(), 
                                                         name='password-reset'),
     path('donate/', views.AddDonationView.as_view(), name='add-donation'),
     path('donate/confirmation/', views.Confirmation.as_view(), name='form-confirmation'),

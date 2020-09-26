@@ -5,12 +5,13 @@ from django.contrib.auth import views
 from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect 
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.hashers import check_password
+from django.contrib import messages
 from django.utils import timezone
 
-from django.contrib.auth.views import PasswordChangeView
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm
 
@@ -43,7 +44,7 @@ class LandingPageView(generic.ListView):
         user_password = self.request.user.password
 
         ##setting session for the user
-        request.session['password_access'] = 'access'
+        self.request.session['password_access'] = 'access'
         if check_password(password, user_password):
             return HttpResponseRedirect(reverse_lazy('profile-update', kwargs={'pk': self.request.user.pk}))
         else:
@@ -199,6 +200,10 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
         return queryset
 
     def get(self, request, *args, **kwargs):
+        """ 
+        Checks for session and instantiate a blank version of the form.
+        Redirects to profile page if session not found
+        """
         self.object = self.get_object()
         ##checking if set session exists 
         if 'password_access' in self.request.session:
@@ -210,12 +215,12 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
             messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
             return HttpResponseRedirect(reverse_lazy('user-profile'))
 
-from django.contrib.auth.views import PasswordChangeView
 
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
 
     """
-    Subclasses django built-in PasswordChangeView overriding get for the access to the page
+    Subclasses django built-in PasswordChangeView. Gets displayed if 
+    Overriding get for the access to the page
     using request.session
     Displays success message on successful form submittion 
     """
@@ -225,7 +230,12 @@ class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
     success_message = 'Hasło zostało zmieniono pomyślnie'
 
     def get(self, request, *args, **kwargs):
-        
+
+        """ 
+        Checks for session and instantiate a blank version of the form.
+        Redirects to profile page if session not found
+        """
+     
         if 'password_access' in self.request.session:
             del self.request.session['password_access']
             return self.render_to_response(self.get_context_data())
