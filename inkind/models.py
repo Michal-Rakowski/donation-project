@@ -114,6 +114,8 @@ class Donation(models.Model):
     pick_up_date_time = models.DateTimeField()
     pick_up_comment = models.CharField(max_length=200)
     status = models.BooleanField(default=False)
+    status_change = models.DateField(blank=True, null=True)
+
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
 

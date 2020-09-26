@@ -46,7 +46,7 @@
                         <td>{% for category in donation.categories.all%}{% include "inkind/comma.html" %}{{ category }}  {% endfor %}</td>
                         {% if donation.status is True%}
                         <td>
-                            <p style='font-size: medium;text-align: left;'>Odebrano</p>
+                            <p style='font-size: medium;text-align: center;'>Odebrano w dniu {{donation.status_change}}</p>
                         </td>
                         {% else %}
                         <td>

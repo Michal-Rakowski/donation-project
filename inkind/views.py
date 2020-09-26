@@ -8,6 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
+from django.utils import timezone
 
 from django.contrib.auth.forms import PasswordChangeForm
 from .models import Donation, Institution, Category, CustomUser
@@ -167,6 +168,7 @@ def ajax_status_change(request):
         status = request.POST.get('status', None)
         donation = Donation.objects.get(pk=status)
         donation.status = True
+        donation.status_change = timezone.now().date()
         donation.save()
         return HttpResponseRedirect(reverse_lazy('user-profile'))
 
