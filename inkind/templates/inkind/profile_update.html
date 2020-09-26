@@ -3,7 +3,7 @@
 {% block content %}
   <header class="header--form-page">
       {% include 'inkind/nav.html'%}
-    <div class="container container--70" style="text-align: center;font-size: 20px; margin-top: 70px;">  
+    <div class="container container--70" style="text-align: center;font-size: 20px; margin-top: 70px;">
     <h1>Edytuj swoje dane</h1>
       <form method="POST" style="float: left;margin-left: 15em;">
         {% csrf_token %}
@@ -37,11 +37,11 @@
           </div>
           {% endfor %}
         <br>
-        <button class="btn" type="submit">Edytuj Dane Osobowe</button> 
+        <button class="btn" type="submit">Edytuj dane osobowe</button> 
         
         </div>
       </form> 
-      <form method="POST" action="{% url 'password-reset' user.id %}">
+      <form method="POST" action="{% url 'password-reset' %}">
         {% csrf_token %}
         {% for field in change_password.visible_fields %}
         <div class="form-group">
@@ -53,7 +53,7 @@
               </table>
             {% endfor %}
             <br>
-            <button class="btn" type="submit">Zmien Haslo Dostępu</button>
+            <button class="btn" type="submit">Zmień hasło dostępu</button>
           </div>   
       </form>
     </div>

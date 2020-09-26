@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
 
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm
 
@@ -38,9 +38,12 @@ class LandingPageView(generic.ListView):
         """ 
         Handles Password Form for Editing User Profile
         """
-        password_form = PasswordForm(request.POST)
+        password_form = PasswordForm(self.request.POST)
         password = self.request.POST.get('password')
         user_password = self.request.user.password
+
+        ##setting session for the user
+        request.session['password_access'] = 'access'
         if check_password(password, user_password):
             return HttpResponseRedirect(reverse_lazy('profile-update', kwargs={'pk': self.request.user.pk}))
         else:
@@ -118,7 +121,6 @@ class Confirmation(views.TemplateView):
     template_name = 'inkind/form-confirmation.html'
 
 
-
 def load_institutions(request):
     """Filtering Institutions on selected categories"""
     if request.method == 'POST':
@@ -144,7 +146,6 @@ class ProfileView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'donations'
     paginate_by = 7
 
-
     def get_queryset(self, *args, **kwargs):
         """
         Returns only donations of the current user
@@ -152,7 +153,6 @@ class ProfileView(LoginRequiredMixin, generic.ListView):
         queryset = self.model.objects.filter(user=self.request.user).order_by('status', '-pick_up_date_time', 'pk')
         return queryset
     
-
     def post(self, request, *args, **kwargs):
         """
         Redirects to ajax function for status update 
@@ -197,3 +197,39 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
         """
         queryset = self.model.objects.filter(id=self.request.user.id)
         return queryset
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        ##checking if set session exists 
+        if 'password_access' in self.request.session:
+            #deleting session if it was there and allowing access to edit profile page
+            del self.request.session['password_access']
+            return self.render_to_response(self.get_context_data())
+        else:
+            #if the session isnt there redirecting user to their profile with message 
+            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+            return HttpResponseRedirect(reverse_lazy('user-profile'))
+
+from django.contrib.auth.views import PasswordChangeView
+
+class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+
+    """
+    Subclasses django built-in PasswordChangeView overriding get for the access to the page
+    using request.session
+    Displays success message on successful form submittion 
+    """
+
+    template_name = 'inkind/password_change.html'
+    success_url = reverse_lazy('user-profile')
+    success_message = 'Hasło zostało zmieniono pomyślnie'
+
+    def get(self, request, *args, **kwargs):
+        
+        if 'password_access' in self.request.session:
+            del self.request.session['password_access']
+            return self.render_to_response(self.get_context_data())
+        else:
+            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+            return HttpResponseRedirect(reverse_lazy('user-profile'))
+
