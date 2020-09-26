@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 
+from django.contrib.auth.forms import PasswordChangeForm
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm
 
@@ -169,7 +170,6 @@ def ajax_status_change(request):
         donation.save()
         return HttpResponseRedirect(reverse_lazy('user-profile'))
 
-from django.contrib.auth.forms import PasswordChangeForm
 
 class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     """
@@ -181,21 +181,17 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
     success_message = "Twój profil został zaktualizowany pomyślnie"
     success_url = reverse_lazy('user-profile')
 
-    def get_initial(self):
-        """
-        Returns the initial data to use for forms on this view.
-        """
-        initial = super().get_initial()
-        initial['first_name'] = self.request.user.first_name
-        initial['last_name'] = self.request.user.last_name
-        initial['email'] = self.request.user.email
-        return initial
-
     def get_context_data(self, **kwargs):
         """
-        Calculates total of donated bags, total of supported institutions and
-        passes its value to the template
+        Passes change_password form to the context for display
         """
         context = super().get_context_data(**kwargs)
         context['change_password'] = PasswordChangeForm(user=self.request.user)
         return context
+
+    def get_queryset(self):
+        """
+        User is able to access only his update page. Raises 'Page not found' for any other users
+        """
+        queryset = self.model.objects.filter(id=self.request.user.id)
+        return queryset
