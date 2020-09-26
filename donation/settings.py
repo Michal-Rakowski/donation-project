@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'inkind.context_processors.password_protected',
             ],
         },
     },
@@ -134,3 +135,6 @@ LOGOUT_REDIRECT_URL = 'landing-page'
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+##
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = True

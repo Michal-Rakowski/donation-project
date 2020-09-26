@@ -43,9 +43,9 @@ class CustomUser(AbstractBaseUser):
     """Custom User Model 
     Required fields: Email, First name, Last name, Password
     """
-    first_name = models.CharField(_('First name'), max_length=150)
-    last_name = models.CharField(_('Last name'), max_length=150)
-    email = models.EmailField(_('Email address'), max_length=255, unique=True, 
+    first_name = models.CharField(_('Imie'), max_length=150)
+    last_name = models.CharField(_('Nazwisko'), max_length=150)
+    email = models.EmailField(_('Email adres'), max_length=255, unique=True, 
         error_messages={
             'unique': _('A user with such email already exists.'),
             },
