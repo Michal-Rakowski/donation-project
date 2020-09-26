@@ -55,7 +55,7 @@
      <!-- Modal content -->
      <div class="modal-content">
        <span class="close">&times;</span>
-       <form method="POST" role="form">
+       <form method="POST" role="form" action="{% url 'landing-page' %}">
            {% csrf_token %}
          <div class="form-group">
            <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Password</label>

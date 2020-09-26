@@ -153,19 +153,9 @@ class ProfileView(LoginRequiredMixin, generic.ListView):
 
     def post(self, request, *args, **kwargs):
         """
-        Redirects to ajax function if request is Ajax. 
-        Else handles Password Form for Editing User Profile
-        """
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':            
-            return ajax_status_change(request)
-        else:
-            password_form = PasswordForm(request.POST)
-            password = self.request.POST.get('password')
-            user_password = self.request.user.password
-            if check_password(password, user_password):
-                return HttpResponseRedirect(reverse_lazy('profile-update', kwargs={'pk': self.request.user.pk}))
-            else:
-                return HttpResponseRedirect(reverse_lazy('user-profile')) 
+        Redirects to ajax function for status update 
+        """         
+        return ajax_status_change(request)
 
 
 def ajax_status_change(request):
@@ -208,6 +198,4 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
         """
         context = super().get_context_data(**kwargs)
         context['change_password'] = PasswordChangeForm(user=self.request.user)
-        return context  
-
-#class PasswordChange(generic)
+        return context
