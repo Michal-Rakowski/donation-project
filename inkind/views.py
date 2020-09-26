@@ -219,8 +219,7 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
 
     """
-    Subclasses django built-in PasswordChangeView. Gets displayed if 
-    Overriding get for the access to the page
+    Subclasses django built-in PasswordChangeView overriding get for the access to the page
     using request.session
     Displays success message on successful form submittion 
     """
