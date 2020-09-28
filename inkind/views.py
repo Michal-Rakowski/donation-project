@@ -3,18 +3,28 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.contrib.auth import views
 from django.db.models import Count, Sum
-from django.http import HttpResponseRedirect 
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
 from django.utils import timezone
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
+from django.http import HttpResponse
+from .token import account_activation_token
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm
 
+#from django.core.paginator import Paginator
 
 class LandingPageView(generic.ListView):
     """
@@ -33,6 +43,7 @@ class LandingPageView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
         context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
+        ##PAGINATION - TO DO 
         return context
 
     def post(self, request, *args, **kwargs):
@@ -52,15 +63,66 @@ class LandingPageView(generic.ListView):
             return HttpResponseRedirect(reverse_lazy('user-profile')) 
 
 
-class RegistrationView(SuccessMessageMixin, generic.CreateView):
+class RegistrationView(generic.CreateView):
     """
     Creates user and redirects to login page upon success
     """
     model = CustomUser
     form_class = UserCreationForm
     template_name = 'inkind/register.html'
-    success_url = reverse_lazy('login')
-    success_message = "User was created successfully"
+    success_url = reverse_lazy('activation-email-send')
+
+    def form_valid(self, form):
+        """If the form is valid, save the associated model. 
+        Sets is_active to false and sends email with activation link """
+        self.object = form.save(commit=False)
+        self.object.is_active = False
+        self.object.save()
+        user = CustomUser.objects.get(pk=self.object.pk)
+  
+        current_site = get_current_site(self.request)
+        mail_subject = 'Aktywacja konta.'
+        message = render_to_string('inkind/activate_account_email.html', {
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        })
+        email_from = settings.EMAIL_HOST_USER
+        to_email = form.cleaned_data.get('email')
+
+        email = EmailMessage(
+                mail_subject, message, email_from, to=[to_email]
+            )
+        email.send()        
+        return super().form_valid(form)
+
+
+def activate(request, uidb64, token):
+    """Activates user profile and redirects to login with success message"""
+    assert uidb64 is not None and token is not None  # checked by URLconf
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = CustomUser._default_manager.get(pk=uid)
+     
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist) as e:
+        user = None
+    if (user is not None and account_activation_token.check_token(user, token)): 
+        user.is_active = True
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 'Twoje konto zastało aktywowane. Możesz załogować sie!')
+        return HttpResponseRedirect(reverse_lazy('login'))
+    else:
+        return HttpResponse('Link aktywacyjny jest niepoprawny!')
+
+
+
+class ActivationEmailSend(views.TemplateView):
+    """
+    Displays message about activation link email
+    """
+    template_name = 'inkind/activate_account.html'
+
 
 
 class CustomLogin(views.LoginView):
@@ -169,7 +231,7 @@ def ajax_status_change(request):
         status = request.POST.get('status', None)
         donation = Donation.objects.get(pk=status)
         donation.status = True
-        donation.status_change = timezone.now().date()
+        donation.status_change = timezone.localtime(timezone.now())
         donation.save()
         return HttpResponseRedirect(reverse_lazy('user-profile'))
 

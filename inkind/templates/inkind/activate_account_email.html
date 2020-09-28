@@ -1,0 +1,7 @@
+{% autoescape off %}  
+Witaj, {{ user.first_name }}!
+
+Prosimy o potwierdzenie swojej rejestracji i maila, klikając w link http://{{ domain }}{% url 'activate' uidb64=uid token=token %}  
+
+Jeżeli dostałeś tę wiadomość przez przypadek, zignoruj ją.
+{% endautoescape %}
