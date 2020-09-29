@@ -112,6 +112,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {   
+        'NAME': 'donation.password_validation.CustomPasswordValidator',
+    },
+
 ]
 
 
@@ -139,13 +143,15 @@ STATIC_URL = '/static/'
 ##
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-##EMAIL CONFIGURATION
-EMAIL_BACKEND = local_settings.EMAIL_BACKEND
-EMAIL_HOST = local_settings.EMAIL_HOST
-EMAIL_USE_TLS = local_settings.EMAIL_USE_TLS
-EMAIL_PORT = local_settings.EMAIL_PORT
-EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
-DEFAULT_FROM_EMAIL = local_settings.DEFAULT_FROM_EMAIL
+#EMAIL CONFIGURATION
+#EMAIL_BACKEND = local_settings.EMAIL_BACKEND
+#EMAIL_HOST = local_settings.EMAIL_HOST
+#EMAIL_USE_TLS = local_settings.EMAIL_USE_TLS
+#EMAIL_PORT = local_settings.EMAIL_PORT
+#EMAIL_HOST_USER = local_settings.EMAIL_HOST_USER
+#EMAIL_HOST_PASSWORD = local_settings.EMAIL_HOST_PASSWORD
+#DEFAULT_FROM_EMAIL = local_settings.DEFAULT_FROM_EMAIL
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SERVER_EMAIL = local_settings.SERVER_EMAIL
+ADMINS = local_settings.ADMINS

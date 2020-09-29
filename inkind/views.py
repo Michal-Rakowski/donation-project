@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, BadHeaderError, send_mail, mail_admins
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -22,9 +22,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.http import HttpResponse
 from .token import account_activation_token
 from .models import Donation, Institution, Category, CustomUser
-from .forms import UserCreationForm, DonationForm, PasswordForm
+from .forms import UserCreationForm, DonationForm, PasswordForm, ContactForm
 
-#from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 
 class LandingPageView(generic.ListView):
     """
@@ -33,7 +34,6 @@ class LandingPageView(generic.ListView):
     model = Institution
     template_name = 'inkind/index.html'
     context_object_name = 'institutions'
-    #paginate_by = 5
 
     def get_context_data(self, **kwargs):
         """
@@ -43,8 +43,48 @@ class LandingPageView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
         context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
-        ##PAGINATION - TO DO 
+    
+        fund_paginator = Paginator(Institution.objects.filter(institution_type='FUND').order_by('id'), 2)
+        fund_page_number = self.request.GET.get('page-fund')
+   
+        try:
+            funds = fund_paginator.page(fund_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            funds = fund_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            funds = fund_paginator.page(fund_paginator.num_pages)
+
+        org_paginator = Paginator(Institution.objects.filter(institution_type='OPOZ').order_by('id'), 2)
+        org_page_number = self.request.GET.get('page-org')
+
+        try:
+            orgs = org_paginator.page(org_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            orgs = org_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            orgs = org_paginator.page(org_paginator.num_pages)
+        
+        loc_paginator = Paginator(Institution.objects.filter(institution_type='ZLOK').order_by('id'), 2)
+        loc_page_number = self.request.GET.get('page-loc')
+
+        try:
+            locs = loc_paginator.page(loc_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            locs = loc_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            locs = loc_paginator.page(loc_paginator.num_pages)
+        
+        context['locs'] = locs
+        context['funds'] = funds
+        context['orgs'] = orgs
         return context
+
 
     def post(self, request, *args, **kwargs):
         """ 
@@ -107,13 +147,12 @@ def activate(request, uidb64, token):
      
     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist) as e:
         user = None
-    if (user is not None and account_activation_token.check_token(user, token)): 
+    if user and account_activation_token.check_token(user, token): 
         user.is_active = True
         user.save()
         messages.add_message(request, messages.SUCCESS, 'Twoje konto zastało aktywowane. Możesz załogować sie!')
         return HttpResponseRedirect(reverse_lazy('login'))
-    else:
-        return HttpResponse('Link aktywacyjny jest niepoprawny!')
+    return HttpResponse('Link aktywacyjny jest niepoprawny!')
 
 
 
@@ -139,12 +178,10 @@ class CustomLogin(views.LoginView):
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            email = form.cleaned_data.get('username')
-            if not email in CustomUser.objects.values_list('email', flat=True):
-                return HttpResponseRedirect(reverse_lazy('register'))
-            else:
-                return self.form_invalid(form)
+        email = form.cleaned_data.get('username')
+        if not email in CustomUser.objects.values_list('email', flat=True):
+            return HttpResponseRedirect(reverse_lazy('register'))
+        return self.form_invalid(form)
 
 
 class AddDonationView(LoginRequiredMixin, generic.FormView):
@@ -272,10 +309,9 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
             #deleting session if it was there and allowing access to edit profile page
             del self.request.session['password_access']
             return self.render_to_response(self.get_context_data())
-        else:
-            #if the session isnt there redirecting user to their profile with message 
-            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
-            return HttpResponseRedirect(reverse_lazy('user-profile'))
+        #if the session isnt there redirecting user to their profile with message 
+        messages.add_message(self.request, messages.ERROR, 'Aby zmienić ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+        return HttpResponseRedirect(reverse_lazy('user-profile'))
 
 
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
@@ -300,7 +336,34 @@ class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
         if 'password_access' in self.request.session:
             del self.request.session['password_access']
             return self.render_to_response(self.get_context_data())
-        else:
-            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
-            return HttpResponseRedirect(reverse_lazy('user-profile'))
+        messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+        return HttpResponseRedirect(reverse_lazy('user-profile'))
 
+
+class ContactUsView(generic.FormView):
+    """
+    Contact Us Form 
+    """
+    form_class = ContactForm
+    success_url = 'thanks'
+
+    def form_valid(self, form):
+        """If the form is valid, redirect to the supplied URL."""
+        name = form.cleaned_data['name']
+        surname = form.cleaned_data['surname']
+        sender = form.cleaned_data['email']
+        content = form.cleaned_data['content']
+        admins = CustomUser.objects.filter(is_admin=True).values_list('email', flat=True).distinct()
+        subject = f"{name} {surname} have send you a message. Email: {sender}"
+        try:
+            #mail_admins(subject=subject, message=content)
+            send_mail(subject=subject, message=content, from_email=sender, recipient_list=admins)
+        except BadHeaderError:
+            return HttpResponse('Invalid header found.')
+        return HttpResponseRedirect(self.get_success_url())
+
+class ContactUsThanksView(generic.TemplateView):
+    """
+    View informing people that their message throught ContactUs form has been send
+    """
+    template_name ='inkind/thanks.html'

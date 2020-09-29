@@ -45,6 +45,9 @@ urlpatterns = [
                             name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='inkind/password_reset_complete.html'), 
                             name='password_reset_complete'),
+    
+    path('contact-us/', views.ContactUsView.as_view(), name='contact-us'),
+    path('contact-us/thanks/', views.ContactUsThanksView.as_view(), name='thanks'),
     path('ajax/load-institutions/', views.load_institutions, name='ajax_load'),
     path('ajax/change_status/', views.ajax_status_change, name='status-update'),
     path('admin/', admin.site.urls),

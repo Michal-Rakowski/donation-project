@@ -59,8 +59,11 @@
           <p>kurier przyjedzie w dogodnym terminie</p>
         </div>
       </div>
-
+      {% if user.is_authenticated %}
+      <a href="{% url 'add-donation' %}" class="btn btn--large">Przekaż dary</a>
+      {% else %}
       <a href="{% url 'register' %}" class="btn btn--large">Załóż konto</a>
+      {% endif %}
     </section>
 
     <section id="about-us" class="about-us">
@@ -93,17 +96,57 @@
               <div class="subtitle">{{ org.description }}</div>
             </div>
 
-            <div class="col"><div class="text">{% for category in org.categories.all %}
+            <div class="col">
+              <div class="text">{% for category in org.categories.all %}
               {% include "inkind/comma.html" %}{{ category }} 
-            {% endfor %}</div></div>
+            {% endfor %}
+              </div>
+          </div>
           </li>
         </ul>
-        {% endfor %}
+         {% endfor %}
+        {% if institution.grouper == 'Fundacja'%}
         <ul class="help--slides-pagination">
-          <li><a href="#" class="btn btn--small btn--without-border active" data-page="1">1</a></li>
+          <li>
+            {% for num in funds.paginator.page_range %}
+            {% if funds.number == num %}
+            <a class="btn btn--small btn--without-border active" href="#help?page-fund={{ num }}">{{ num }}</a>
+            {% elif num > funds.number|add:'-3' and num < funds.number|add:'3' %}
+            <a class="btn btn--small btn--without-border " href="#help?page-fund={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+          </li>
         </ul>
+     
+       
+        {% elif institution.grouper == 'Organizacja pozarządowa'%}
+        <ul class="help--slides-pagination">
+          <li>
+            {% for num in orgs.paginator.page_range %}
+            {% if orgs.number == num %}
+            <a class="btn btn--small btn--without-border active" href="#help?page-org={{ num }}">{{ num }}</a>
+            {% elif num > orgs.number|add:'-3' and num < orgs.number|add:'3' %}
+            <a class="btn btn--small btn--without-border" href="#help?page-org={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+          </li>
+        </ul>
+        {% elif institution.grouper == 'Zbiórka lokalna'%}
+        <ul class="help--slides-pagination">
+          <li>
+            {% for num in locs.paginator.page_range %}
+            {% if locs.number == num %}
+            <a class="btn btn--small btn--without-border active" href="#help?page-loc={{ num }}">{{ num }}</a>
+            {% elif num > locs.number|add:'-3' and num < locs.number|add:'3' %}
+            <a class="btn btn--small btn--without-border" href="#help?page-loc={{ num }}">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+          </li>
+        </ul>
+        {% endif %} 
       </div>
       {% endfor %}
+      
     {% else %}
         <h2>Zgloś instytucję</h2>
     {% endif %}
