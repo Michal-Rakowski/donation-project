@@ -14,7 +14,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, BadHeaderError, send_mail, mail_admins
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -22,9 +22,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.http import HttpResponse
 from .token import account_activation_token
 from .models import Donation, Institution, Category, CustomUser
-from .forms import UserCreationForm, DonationForm, PasswordForm
+from .forms import UserCreationForm, DonationForm, PasswordForm, ContactForm
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 
 class LandingPageView(generic.ListView):
     """
@@ -338,3 +339,31 @@ class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
         messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
         return HttpResponseRedirect(reverse_lazy('user-profile'))
 
+
+class ContactUsView(generic.FormView):
+    """
+    Contact Us Form 
+    """
+    form_class = ContactForm
+    success_url = 'thanks'
+
+    def form_valid(self, form):
+        """If the form is valid, redirect to the supplied URL."""
+        name = form.cleaned_data['name']
+        surname = form.cleaned_data['surname']
+        sender = form.cleaned_data['email']
+        content = form.cleaned_data['content']
+        admins = CustomUser.objects.filter(is_admin=True).values_list('email', flat=True).distinct()
+        subject = f"{name} {surname} have send you a message. Email: {sender}"
+        try:
+            #mail_admins(subject=subject, message=content)
+            send_mail(subject=subject, message=content, from_email=sender, recipient_list=admins)
+        except BadHeaderError:
+            return HttpResponse('Invalid header found.')
+        return HttpResponseRedirect(self.get_success_url())
+
+class ContactUsThanksView(generic.TemplateView):
+    """
+    View informing people that their message throught ContactUs form has been send
+    """
+    template_name ='inkind/thanks.html'

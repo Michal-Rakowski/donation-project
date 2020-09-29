@@ -103,3 +103,13 @@ class PasswordForm(forms.Form):
     Form for accessing user profile update view
     """
     password = forms.CharField(widget=forms.PasswordInput)   
+
+
+class ContactForm(forms.Form):
+    """
+    Form for sending email to site-admins
+    """
+    name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Imię'}))
+    surname = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Nazwisko'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}))
+    content = forms.CharField(widget=forms.Textarea(attrs={'row': 1,'style': 'height: 3em;','placeholder': 'Wiadomość'}))
