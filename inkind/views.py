@@ -146,13 +146,12 @@ def activate(request, uidb64, token):
      
     except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist) as e:
         user = None
-    if (user is not None and account_activation_token.check_token(user, token)): 
+    if user and account_activation_token.check_token(user, token): 
         user.is_active = True
         user.save()
         messages.add_message(request, messages.SUCCESS, 'Twoje konto zastało aktywowane. Możesz załogować sie!')
         return HttpResponseRedirect(reverse_lazy('login'))
-    else:
-        return HttpResponse('Link aktywacyjny jest niepoprawny!')
+    return HttpResponse('Link aktywacyjny jest niepoprawny!')
 
 
 
@@ -178,12 +177,10 @@ class CustomLogin(views.LoginView):
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
-        else:
-            email = form.cleaned_data.get('username')
-            if not email in CustomUser.objects.values_list('email', flat=True):
-                return HttpResponseRedirect(reverse_lazy('register'))
-            else:
-                return self.form_invalid(form)
+        email = form.cleaned_data.get('username')
+        if not email in CustomUser.objects.values_list('email', flat=True):
+            return HttpResponseRedirect(reverse_lazy('register'))
+        return self.form_invalid(form)
 
 
 class AddDonationView(LoginRequiredMixin, generic.FormView):
@@ -311,10 +308,9 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
             #deleting session if it was there and allowing access to edit profile page
             del self.request.session['password_access']
             return self.render_to_response(self.get_context_data())
-        else:
-            #if the session isnt there redirecting user to their profile with message 
-            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
-            return HttpResponseRedirect(reverse_lazy('user-profile'))
+        #if the session isnt there redirecting user to their profile with message 
+        messages.add_message(self.request, messages.ERROR, 'Aby zmienić ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+        return HttpResponseRedirect(reverse_lazy('user-profile'))
 
 
 class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
@@ -339,7 +335,6 @@ class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
         if 'password_access' in self.request.session:
             del self.request.session['password_access']
             return self.render_to_response(self.get_context_data())
-        else:
-            messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
-            return HttpResponseRedirect(reverse_lazy('user-profile'))
+        messages.add_message(self.request, messages.ERROR, 'Aby zmienic ustawienia konta wybierz opcję "Ustawienia" w panelu użykownika')
+        return HttpResponseRedirect(reverse_lazy('user-profile'))
 

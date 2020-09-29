@@ -112,6 +112,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {   
+        'NAME': 'donation.password_validation.CustomPasswordValidator',
+    },
+
 ]
 
 
@@ -139,7 +143,7 @@ STATIC_URL = '/static/'
 ##
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-##EMAIL CONFIGURATION
+#EMAIL CONFIGURATION
 EMAIL_BACKEND = local_settings.EMAIL_BACKEND
 EMAIL_HOST = local_settings.EMAIL_HOST
 EMAIL_USE_TLS = local_settings.EMAIL_USE_TLS
