@@ -47,7 +47,7 @@ class CustomUser(AbstractBaseUser):
     last_name = models.CharField(_('Nazwisko'), max_length=150)
     email = models.EmailField(_('Email adres'), max_length=255, unique=True, 
         error_messages={
-            'unique': _('A user with such email already exists.'),
+            'unique': _('Użytkownik z takim mailem już istnieje.'),
             },
     )
     #is_staff = models.BooleanField(_('Staff status'), default=False, help_text=
