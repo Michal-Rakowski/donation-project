@@ -65,7 +65,7 @@ class LandingPageView(generic.ListView):
 
 class RegistrationView(generic.CreateView):
     """
-    Creates user and redirects to login page upon success
+    Creates user and redirects to information page about activating account upon success
     """
     model = CustomUser
     form_class = UserCreationForm
