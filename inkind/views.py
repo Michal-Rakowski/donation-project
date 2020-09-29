@@ -24,7 +24,7 @@ from .token import account_activation_token
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm
 
-#from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 class LandingPageView(generic.ListView):
     """
@@ -33,7 +33,6 @@ class LandingPageView(generic.ListView):
     model = Institution
     template_name = 'inkind/index.html'
     context_object_name = 'institutions'
-    #paginate_by = 5
 
     def get_context_data(self, **kwargs):
         """
@@ -43,8 +42,48 @@ class LandingPageView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
         context['total_institutions'] = Donation.objects.aggregate(total_institutions=Count('institution', distinct=True))['total_institutions']
-        ##PAGINATION - TO DO 
+    
+        fund_paginator = Paginator(Institution.objects.filter(institution_type='FUND').order_by('id'), 2)
+        fund_page_number = self.request.GET.get('page-fund')
+   
+        try:
+            funds = fund_paginator.page(fund_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            funds = fund_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            funds = fund_paginator.page(fund_paginator.num_pages)
+
+        org_paginator = Paginator(Institution.objects.filter(institution_type='OPOZ').order_by('id'), 2)
+        org_page_number = self.request.GET.get('page-org')
+
+        try:
+            orgs = org_paginator.page(org_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            orgs = org_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            orgs = org_paginator.page(org_paginator.num_pages)
+        
+        loc_paginator = Paginator(Institution.objects.filter(institution_type='ZLOK').order_by('id'), 2)
+        loc_page_number = self.request.GET.get('page-loc')
+
+        try:
+            locs = loc_paginator.page(loc_page_number)
+        except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+            locs = loc_paginator.page(1)
+        except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+            locs = loc_paginator.page(loc_paginator.num_pages)
+        
+        context['locs'] = locs
+        context['funds'] = funds
+        context['orgs'] = orgs
         return context
+
 
     def post(self, request, *args, **kwargs):
         """ 
