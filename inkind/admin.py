@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
+from django.core.exceptions import PermissionDenied
 from .forms import UserCreationForm, UserChangeForm
 from .models import *
 
@@ -43,6 +43,7 @@ admin.site.register(Category)
 
 
 
+
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
@@ -70,9 +71,33 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+    def delete_model(self, request, obj):
+        """
+        Given a model instance delete it from the database.
+        """
+        user_acc = request.user
+        admin_count = CustomUser.objects.filter(is_active=True).filter(is_admin=True).count()
+        last_added_admin = CustomUser.objects.filter(is_active=True).filter(is_admin=True).last()
+        if obj == user_acc:
+            raise PermissionDenied
+        if admin_count < 5:
+            raise PermissionDenied
+        if obj == last_added_admin:
+            raise PermissionDenied
+        obj.delete()
+
+
 
 # Now register the new UserAdmin...
 admin.site.register(CustomUser, UserAdmin)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 admin.site.unregister(Group)
+
+
+#test4@admin.com
+#test4
+#test5admin@admin.com
+#test5
+#test6admin@admin.com
+#test6

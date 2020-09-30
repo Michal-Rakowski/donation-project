@@ -61,9 +61,9 @@ document.addEventListener("DOMContentLoaded", function() {
     */
     changePage(e) {
      // e.preventDefault();
-      const page = e.target.dataset.page;
+      //const page = e.target.dataset.page;
 
-      console.log(page);
+      //console.log(page);
     } 
   }
   const helpSection = document.querySelector(".help");

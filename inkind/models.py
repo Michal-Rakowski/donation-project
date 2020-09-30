@@ -119,6 +119,11 @@ class Donation(models.Model):
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
 
+    def save(self, *args, **kwargs):
+        if self.pick_up_date_time < timezone.now():
+            raise ValidationError("The date cannot be in the past!")
+        super(Donation, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Darowizna'
         verbose_name_plural = 'Przekazane Dary'

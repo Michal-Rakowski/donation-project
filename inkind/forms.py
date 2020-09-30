@@ -63,6 +63,10 @@ from django.utils import timezone
 def pick_up_date():
     return timezone.now() + timezone.timedelta(days=1)
 
+def pick_up_date_validator(value):
+    if value < timezone.now():
+        raise ValidationError("Data odbioru nie może być z przeslości")
+
 class DonationForm(forms.ModelForm):
     """
     Form for submitting donation
@@ -75,7 +79,7 @@ class DonationForm(forms.ModelForm):
     pick_up_date_time = forms.SplitDateTimeField(
         initial=pick_up_date,
         required=True,
-        widget=forms.SplitDateTimeWidget)
+        widget=forms.SplitDateTimeWidget, validators=[pick_up_date_validator])
     pick_up_comment = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:

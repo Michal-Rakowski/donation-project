@@ -35,6 +35,7 @@ class LandingPageView(generic.ListView):
     template_name = 'inkind/index.html'
     context_object_name = 'institutions'
 
+
     def get_context_data(self, **kwargs):
         """
         Calculates total of donated bags, total of supported institutions and
