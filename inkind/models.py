@@ -39,6 +39,7 @@ class Institution(models.Model):
         verbose_name = 'Organizacja'
         verbose_name_plural = 'Zaufane Organizację'
 
+
 class CustomUser(AbstractBaseUser):
     """Custom User Model 
     Required fields: Email, First name, Last name, Password
@@ -101,6 +102,7 @@ class CustomUser(AbstractBaseUser):
         verbose_name = 'Użytkownik'
         verbose_name_plural = 'Użytkownicy'
 
+
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, blank=True, null=True)
@@ -118,6 +120,11 @@ class Donation(models.Model):
 
     def __str__(self):
         return f'{self.user.last_name}({self.city}) Donation'
+
+    def save(self, *args, **kwargs):
+        if self.pick_up_date_time < timezone.now():
+            raise ValidationError("The date cannot be in the past!")
+        super(Donation, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Darowizna'

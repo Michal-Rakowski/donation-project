@@ -20,17 +20,19 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 });
 
+
 //Step - 2
 document.addEventListener("DOMContentLoaded", function(){
     let quantity = document.querySelector('input#id_quantity');
     let step2button = document.querySelector('#second-step');
+    //let value = Number.parseInt(quantity.value, 10)
     quantity.addEventListener('change', function() {
-        if (quantity.value < 1 || quantity.value > 100 ) {
+        if (quantity.value < 1 || quantity.value > 100 || quantity.value % 1 !== 0) {
             step2button.disabled = true
-            document.getElementById('quantity-help-text').innerHTML = "Ilość worków nie może byc mniejsza od 1 lub większą od 100"
+            //document.getElementById('quantity-help-text').innerHTML = "Ilość worków nie może byc mniejsza od 1 lub większą od 100"
         } else {
             step2button.disabled = false
-         }
+        }
     });
 });
 

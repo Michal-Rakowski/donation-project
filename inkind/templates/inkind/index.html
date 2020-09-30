@@ -110,9 +110,9 @@
           <li>
             {% for num in funds.paginator.page_range %}
             {% if funds.number == num %}
-            <a class="btn btn--small btn--without-border active" href="#help?page-fund={{ num }}">{{ num }}</a>
+            <a class="btn btn--small btn--without-border active" href="#help?page-fund={{ num }}" data-page="{{num}}">{{ num }}</a>
             {% elif num > funds.number|add:'-3' and num < funds.number|add:'3' %}
-            <a class="btn btn--small btn--without-border " href="#help?page-fund={{ num }}">{{ num }}</a>
+            <a class="btn btn--small btn--without-border " href="#help?page-fund={{ num }}" data-page="{{num}}">{{ num }}</a>
             {% endif %}
             {% endfor %}
           </li>
@@ -124,24 +124,23 @@
           <li>
             {% for num in orgs.paginator.page_range %}
             {% if orgs.number == num %}
-            <a class="btn btn--small btn--without-border active" href="#help?page-org={{ num }}">{{ num }}</a>
+            <a class="btn btn--small btn--without-border active" href="#help?page-org={{ num }}" data-page="{{num}}">{{ num }}</a>
             {% elif num > orgs.number|add:'-3' and num < orgs.number|add:'3' %}
-            <a class="btn btn--small btn--without-border" href="#help?page-org={{ num }}">{{ num }}</a>
+            <a class="btn btn--small btn--without-border" href="#help?page-org={{ num }}" data-page="{{num}}">{{ num }}</a>
             {% endif %}
             {% endfor %}
           </li>
         </ul>
         {% elif institution.grouper == 'Zbiórka lokalna'%}
         <ul class="help--slides-pagination">
-          <li>
             {% for num in locs.paginator.page_range %}
             {% if locs.number == num %}
-            <a class="btn btn--small btn--without-border active" href="#help?page-loc={{ num }}">{{ num }}</a>
+            <li><a class="btn btn--small btn--without-border active" href="#help?page-loc={{ num }}" data-page="{{num}}">{{ num }}</a></li>
             {% elif num > locs.number|add:'-3' and num < locs.number|add:'3' %}
-            <a class="btn btn--small btn--without-border" href="#help?page-loc={{ num }}">{{ num }}</a>
+            <li><a class="btn btn--small btn--without-border" href="#help?page-loc={{ num }}" data-page="{{num}}">{{ num }}</a></li>
             {% endif %}
             {% endfor %}
-          </li>
+          
         </ul>
         {% endif %} 
       </div>

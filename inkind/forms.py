@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import CustomUser, Donation, Institution, Category
 from django.contrib.auth.password_validation import get_password_validators, validate_password
 
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -63,6 +64,10 @@ from django.utils import timezone
 def pick_up_date():
     return timezone.now() + timezone.timedelta(days=1)
 
+def pick_up_date_validator(value):
+    if value < timezone.now():
+        raise ValidationError("Data odbioru nie może być z przeslości")
+
 class DonationForm(forms.ModelForm):
     """
     Form for submitting donation
@@ -75,7 +80,7 @@ class DonationForm(forms.ModelForm):
     pick_up_date_time = forms.SplitDateTimeField(
         initial=pick_up_date,
         required=True,
-        widget=forms.SplitDateTimeWidget)
+        widget=forms.SplitDateTimeWidget, validators=[pick_up_date_validator])
     pick_up_comment = forms.CharField(widget=forms.Textarea, required=False)
 
     class Meta:
@@ -113,3 +118,4 @@ class ContactForm(forms.Form):
     surname = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Nazwisko'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Email'}))
     content = forms.CharField(widget=forms.Textarea(attrs={'row': 1,'style': 'height: 3em;','placeholder': 'Wiadomość'}))
+

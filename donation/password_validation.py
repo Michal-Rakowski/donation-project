@@ -16,7 +16,7 @@ class CustomPasswordValidator():
         if not any(char in special_characters for char in password):
             raise ValidationError(_('Password must contain at least %(min_length)d special character.') % {'min_length': self.min_length})
         if not any(char.isupper() for char in password):
-            raise ValidationError(_('Password must contain at least %(min_length)d wielką litere.') % {'min_length': self.min_length})
+            raise ValidationError(_('Password must contain at least %(min_length)d capital letter.') % {'min_length': self.min_length})
 
     def get_help_text(self):
         return ""
