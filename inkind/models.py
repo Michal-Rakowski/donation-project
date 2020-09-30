@@ -39,6 +39,7 @@ class Institution(models.Model):
         verbose_name = 'Organizacja'
         verbose_name_plural = 'Zaufane Organizację'
 
+
 class CustomUser(AbstractBaseUser):
     """Custom User Model 
     Required fields: Email, First name, Last name, Password
@@ -100,6 +101,7 @@ class CustomUser(AbstractBaseUser):
     class Meta:
         verbose_name = 'Użytkownik'
         verbose_name_plural = 'Użytkownicy'
+
 
 class Donation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True) 

@@ -42,8 +42,6 @@ admin.site.register(Donation, DonationAdmin)
 admin.site.register(Category)
 
 
-
-
 class UserAdmin(BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
@@ -71,6 +69,7 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+
     def delete_model(self, request, obj):
         """
         Given a model instance delete it from the database.
@@ -87,17 +86,8 @@ class UserAdmin(BaseUserAdmin):
         obj.delete()
 
 
-
 # Now register the new UserAdmin...
 admin.site.register(CustomUser, UserAdmin)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 admin.site.unregister(Group)
-
-
-#test4@admin.com
-#test4
-#test5admin@admin.com
-#test5
-#test6admin@admin.com
-#test6

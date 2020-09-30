@@ -1,30 +1,26 @@
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import generic
-from django.contrib.auth import views
 from django.db.models import Count, Sum
 from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib import messages
+from django.contrib.auth import views
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib import messages
-from django.utils import timezone
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
 from django.core.mail import EmailMessage, BadHeaderError, send_mail, mail_admins
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
-from django.http import HttpResponse
 from .token import account_activation_token
 from .models import Donation, Institution, Category, CustomUser
 from .forms import UserCreationForm, DonationForm, PasswordForm, ContactForm
-
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 class LandingPageView(generic.ListView):
@@ -35,11 +31,10 @@ class LandingPageView(generic.ListView):
     template_name = 'inkind/index.html'
     context_object_name = 'institutions'
 
-
     def get_context_data(self, **kwargs):
         """
         Calculates total of donated bags, total of supported institutions and
-        passes its value to the template
+        passes its value to the template. 
         """
         context = super().get_context_data(**kwargs)
         context['total_bags'] = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags']
@@ -301,7 +296,7 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
 
     def get(self, request, *args, **kwargs):
         """ 
-        Checks for session and instantiate a blank version of the form.
+        Checks for session key and instantiate a blank version of the form.
         Redirects to profile page if session not found
         """
         self.object = self.get_object()
@@ -315,7 +310,7 @@ class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateV
         return HttpResponseRedirect(reverse_lazy('user-profile'))
 
 
-class CustomPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+class CustomPasswordChangeView(SuccessMessageMixin, views.PasswordChangeView):
 
     """
     Subclasses django built-in PasswordChangeView overriding get for the access to the page
@@ -355,7 +350,7 @@ class ContactUsView(generic.FormView):
         sender = form.cleaned_data['email']
         content = form.cleaned_data['content']
         admins = CustomUser.objects.filter(is_admin=True).values_list('email', flat=True).distinct()
-        subject = f"{name} {surname} have send you a message. Email: {sender}"
+        subject = f"{name} {surname} have send you a message."
         try:
             #mail_admins(subject=subject, message=content)
             send_mail(subject=subject, message=content, from_email=sender, recipient_list=admins)
